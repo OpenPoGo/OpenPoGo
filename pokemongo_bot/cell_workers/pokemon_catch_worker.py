@@ -79,16 +79,16 @@ class PokemonCatchWorker(object):
                                 if pokeball is 0 and cp <= 300 and balls_stock[2] < 10:
                                     print('Great Ball stock is low... saving for pokemon with cp greater than 300')
                                 elif cp > 300 or pokeball is 0:
-                                    #print 'use Great Ball'
+                                    # print 'use Great Ball'
                                     pokeball = 2
 
                             if balls_stock[3] > 0:
                                 if pokeball is 0 and cp <= 700 and balls_stock[3] < 10:
                                     print('Ultra Ball stock is low... saving for pokemon with cp greater than 700')
                                 elif cp > 700 or pokeball is 0:
-                                    #print 'use Utra Ball'
+                                    # print 'use Utra Ball'
                                     pokeball = 3
-                                    
+
                             if pokeball is 0:
                                 print_red(
                                     '[x] Out of pokeballs, switching to farming mode...')
@@ -146,7 +146,7 @@ class PokemonCatchWorker(object):
                                             '[#] {} has been exchanged for candy!'.format(pokemon_name))
                                     else:
                                         print_green(
-                                        '[x] Captured {}! [CP {}]'.format(pokemon_name, cp))
+                                            '[x] Captured {}! [CP {}]'.format(pokemon_name, cp))
                             break
         time.sleep(5)
 
@@ -216,8 +216,8 @@ class PokemonCatchWorker(object):
             cp_iv_logic = self._get_release_config_for('any').get('cp_iv_logic', 'and')
 
         release_results = {
-            'cp':               False,
-            'iv':               False,
+            'cp': False,
+            'iv': False,
         }
 
         if release_config.get('min_cp'):

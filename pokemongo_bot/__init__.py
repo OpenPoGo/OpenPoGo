@@ -20,6 +20,7 @@ from item_list import Item
 
 
 class PokemonGoBot(object):
+
     def __init__(self, config):
         self.config = config
         self.pokemon_list = json.load(open('data/pokemon.json'))
@@ -80,8 +81,7 @@ class PokemonGoBot(object):
             # Sort all by distance from current pos- eventually this should
             # build graph & A* it
             cell['catchable_pokemons'].sort(
-                key=
-                lambda x: distance(self.position[0], self.position[1], x['latitude'], x['longitude']))
+                key=lambda x: distance(self.position[0], self.position[1], x['latitude'], x['longitude']))
             for pokemon in cell['catchable_pokemons']:
                 with open('web/catchable-%s.json' %
                           (self.config.username), 'w') as outfile:
@@ -93,12 +93,11 @@ class PokemonGoBot(object):
                           (self.config.username), 'w') as outfile:
                     json.dump({}, outfile)
         if (self.config.mode == "all" or self.config.mode == "poke"
-            ) and 'wild_pokemons' in cell and len(cell['wild_pokemons']) > 0:
+                ) and 'wild_pokemons' in cell and len(cell['wild_pokemons']) > 0:
             # Sort all by distance from current pos- eventually this should
             # build graph & A* it
             cell['wild_pokemons'].sort(
-                key=
-                lambda x: distance(self.position[0], self.position[1], x['latitude'], x['longitude']))
+                key=lambda x: distance(self.position[0], self.position[1], x['latitude'], x['longitude']))
             for pokemon in cell['wild_pokemons']:
                 worker = PokemonCatchWorker(pokemon, self)
                 if worker.work() == -1:
@@ -204,7 +203,7 @@ class PokemonGoBot(object):
     def drop_item(self, item_id, count):
         self.api.recycle_inventory_item(item_id=item_id, count=count)
         inventory_req = self.api.call()
-        
+
         # Example of good request response
         #{'responses': {'RECYCLE_INVENTORY_ITEM': {'result': 1, 'new_count': 46}}, 'status_code': 1, 'auth_ticket': {'expire_timestamp_ms': 1469306228058L, 'start': '/HycFyfrT4t2yB2Ij+yoi+on778aymMgxY6RQgvrGAfQlNzRuIjpcnDd5dAxmfoTqDQrbz1m2dGqAIhJ+eFapg==', 'end': 'f5NOZ95a843tgzprJo4W7Q=='}, 'request_id': 8145806132888207460L}
         return inventory_req
@@ -213,7 +212,7 @@ class PokemonGoBot(object):
         logger.log('[x] Initial Transfer.')
 
         logger.log(
-        '[x] Preparing to transfer all Pokemon duplicates, keeping the highest CP of each one type.')
+            '[x] Preparing to transfer all Pokemon duplicates, keeping the highest CP of each one type.')
 
         logger.log('[x] Will NOT transfer anything above CP {}'.format(
             self.config.initial_transfer))

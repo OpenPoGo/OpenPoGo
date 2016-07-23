@@ -77,8 +77,7 @@ def init_config():
     parser.add_argument(
         "-w",
         "--walk",
-        help=
-        "Walk instead of teleport with given speed (meters per second, e.g. 2.5)",
+        help="Walk instead of teleport with given speed (meters per second, e.g. 2.5)",
         type=float,
         default=2.5)
     parser.add_argument("-k",
@@ -89,15 +88,13 @@ def init_config():
     parser.add_argument(
         "-ms",
         "--max_steps",
-        help=
-        "Set the steps around your initial location(DEFAULT 5 mean 25 cells around your location)",
+        help="Set the steps around your initial location(DEFAULT 5 mean 25 cells around your location)",
         type=int,
         default=50)
     parser.add_argument(
         "-it",
         "--initial_transfer",
-        help=
-        "Transfer all pokemon with same ID on bot start, except pokemon with highest CP. Can receive a CP number to not transfer above it",
+        help="Transfer all pokemon with same ID on bot start, except pokemon with highest CP. Can receive a CP number to not transfer above it",
         type=int,
         default=999999)
     parser.add_argument("-d",
@@ -113,16 +110,14 @@ def init_config():
     parser.add_argument(
         "-du",
         "--distance_unit",
-        help=
-        "Set the unit to display distance in (e.g, km for kilometers, mi for miles, ft for feet)",
+        help="Set the unit to display distance in (e.g, km for kilometers, mi for miles, ft for feet)",
         type=str,
         default="km")
-    
+
     parser.add_argument(
         "-if",
         "--item_filter",
-        help=
-        "Pass a list of unwanted items to recycle when collected at a Pokestop (e.g, [\"101\",\"102\",\"103\",\"104\"] to recycle potions when collected)",
+        help="Pass a list of unwanted items to recycle when collected at a Pokestop (e.g, [\"101\",\"102\",\"103\",\"104\"] to recycle potions when collected)",
         type=list,
         default=[])
 
