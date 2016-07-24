@@ -16,6 +16,4 @@ instance/
 Thumbs.db
 .idea
 data/last-location-*.json
-web/catchable-*.json
-web/inventory-*.json
-web/location-*.json
+web/
