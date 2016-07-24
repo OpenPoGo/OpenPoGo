@@ -56,7 +56,7 @@ class PokemonCatchWorker(object):
                                             'pokemon_data'][individual_stat]
                                     except:
                                         continue
-                                print total_IV
+                                logger.log(total_IV)
                                 pokemon_potential = round((total_IV / 45.0), 2)
                                 pokemon_num = int(pokemon['pokemon_data'][
                                     'pokemon_id']) - 1
@@ -74,21 +74,21 @@ class PokemonCatchWorker(object):
                             pokeball = 0
 
                             if balls_stock[1] > 0:
-                                # print 'use Poke Ball'
+                                # logger.log('use Poke Ball')
                                 pokeball = 1
 
                             if balls_stock[2] > 0:
                                 if pokeball is 0 and cp <= 300 and balls_stock[2] < 10:
                                     print('Great Ball stock is low... saving for pokemon with cp greater than 300')
                                 elif cp > 300 or pokeball is 0:
-                                    # print 'use Great Ball'
+                                    # logger.log('use Great Ball')
                                     pokeball = 2
 
                             if balls_stock[3] > 0:
                                 if pokeball is 0 and cp <= 700 and balls_stock[3] < 10:
                                     print('Ultra Ball stock is low... saving for pokemon with cp greater than 700')
                                 elif cp > 700 or pokeball is 0:
-                                    # print 'use Utra Ball'
+                                    # logger.log('use Utra Ball')
                                     pokeball = 3
 
                             if pokeball is 0:
