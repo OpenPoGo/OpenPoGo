@@ -4,6 +4,7 @@ import struct
 from math import cos, asin, sqrt
 from colorama import init
 init()
+from pokemongo_bot import logger
 
 
 def distance(lat1, lon1, lat2, lon2):
@@ -97,12 +98,12 @@ def i2f(int):
 
 
 def print_green(message):
-    print(u'\033[92m' + message.decode('utf-8') + '\033[0m')
+    logger.log(u'\033[92m' + message.decode('utf-8') + '\033[0m')
 
 
 def print_yellow(message):
-    print(u'\033[93m' + message.decode('utf-8') + '\033[0m')
+    logger.log(u'\033[93m' + message.decode('utf-8') + '\033[0m')
 
 
 def print_red(message):
-    print(u'\033[91m' + message.decode('utf-8') + '\033[0m')
+    logger.log(u'\033[91m' + message.decode('utf-8') + '\033[0m')

@@ -54,7 +54,7 @@ class Stepper(object):
                     self._walk_to(self.config.walk, *position)
                 else:
                     self.api.set_position(*position)
-                print('[#] {}'.format(position))
+                logger.log('[#] {}'.format(position))
             if self.x == self.y or self.x < 0 and self.x == -self.y or self.x > 0 and self.x == 1 - self.y:
                 (self.dx, self.dy) = (-self.dy, self.dx)
 
@@ -101,7 +101,7 @@ class Stepper(object):
                                  cell_id=cellid)
 
         response_dict = self.api.call()
-        # pprint.pprint(response_dict)
+        # logger.log(response_dict)
         # Passing Variables through a file
         if response_dict and 'responses' in response_dict:
             if 'GET_MAP_OBJECTS' in response_dict['responses']:
@@ -128,8 +128,8 @@ class Stepper(object):
                             'GET_MAP_OBJECTS']['map_cells']
                         position = (lat, lng, alt)
                     # Sort all by distance from current pos- eventually this should build graph & A* it
-                    # print(map_cells)
-                    # print( s2sphere.from_token(x['s2_cell_id']) )
+                    # logger.log(map_cells)
+                    # logger.log( s2sphere.from_token(x['s2_cell_id']) )
                     map_cells.sort(key=lambda x: distance(lat, lng, x['forts'][0]['latitude'], x[
                                    'forts'][0]['longitude']) if 'forts' in x and x['forts'] != [] else 1e6)
                     for cell in map_cells:

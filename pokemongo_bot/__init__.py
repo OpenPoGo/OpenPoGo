@@ -114,7 +114,7 @@ class PokemonGoBot(object):
                     worker = SeenFortWorker(fort, self)
                     hack_chain = worker.work()
                     if hack_chain > 10:
-                        # print('need a rest')
+                        # logger.log('need a rest')
                         break
 
     def _setup_logging(self):
@@ -154,7 +154,7 @@ class PokemonGoBot(object):
         self.api.get_player()
 
         response_dict = self.api.call()
-        # print('Response dictionary: \n\r{}'.format(json.dumps(response_dict, indent=2)))
+        # logger.log('Response dictionary: \n\r{}'.format(json.dumps(response_dict, indent=2)))
         currency_1 = "0"
         currency_2 = "0"
 
@@ -201,7 +201,7 @@ class PokemonGoBot(object):
     def drop_item(self, item_id, count):
         self.api.recycle_inventory_item(item_id=item_id, count=count)
         inventory_req = self.api.call()
-        print(inventory_req)
+        logger.log(inventory_req)
 
     def initial_transfer(self):
         logger.log('[x] Initial Transfer.')
@@ -232,7 +232,7 @@ class PokemonGoBot(object):
                     if (self.config.cp and group_cp[x] > self.config.cp) or (pokemon_name in ignlist or pokemon_num in ignlist):
                         continue
 
-                    print('[x] Transferring #{} ({}) with CP {}'.format(id, pokemon_name, group_cp[x]))
+                    logger.log('[x] Transferring #{} ({}) with CP {}'.format(id, pokemon_name, group_cp[x]))
                     self.api.release_pokemon(pokemon_id=pokemon_groups[id][group_cp[x]])
                     response_dict = self.api.call()
                     sleep(2)
@@ -373,7 +373,7 @@ class PokemonGoBot(object):
         try:
             inventory_items = response_dict['responses']['GET_INVENTORY']['inventory_delta']['inventory_items']
             for item in inventory_items:
-                # print('item {}'.format(item))
+                # logger.log('item {}'.format(item))
                 if 'inventory_item_data' in item:
                     item_data = item['inventory_item_data']
                     if 'pokemon_data' in item_data:
@@ -395,7 +395,7 @@ class PokemonGoBot(object):
         try:
             inventory_items = response_dict['responses']['GET_INVENTORY']['inventory_delta']['inventory_items']
             for item in inventory_items:
-                # print('item {}'.format(item))
+                # logger.log('item {}'.format(item))
                 try:
                     player_stats = item['inventory_item_data']['player_stats']
 
