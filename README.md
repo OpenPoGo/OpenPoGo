@@ -134,6 +134,9 @@ This project uses Google Maps. There's one map coupled with the project, but as 
         ```  
     5. You can now debug on the log to see if get what you need  
 
+## Setting up Web Viewer to watch your bot at work  
+Head over to the [OpenPoGoWeb](https://github.com/OpenPoGo/OpenPoGoWeb) Project and follow the instructions to clone it into your ``web`` directory.  
+
 ## FAQ
 
 ### What's IV ?
