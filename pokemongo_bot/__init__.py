@@ -12,6 +12,7 @@ import yaml
 
 from cell_workers import PokemonCatchWorker, SeenFortWorker
 from cell_workers.utils import filtered_forts, distance
+from events import EventManager
 from human_behaviour import sleep
 from item_list import Item
 from pgoapi import PGoApi
@@ -34,81 +35,22 @@ class PokemonGoBot(object):
         self._setup_api()
         self._setup_ignored_pokemon()
         self.stepper = Stepper(self)
+        self.event_manager = EventManager(self)
         random.seed()
 
     def take_step(self):
+        """
+        self.event_manager.emit_event('before_movement')
+        self.event_manager.emit_event('movement')
+        self.event_manager.emit_event('after_movement')
+        """
+
         self.stepper.take_step()
 
-    def work_on_cell(self, map_cells, position, include_fort_on_path):
-        self._remove_ignored_pokemon(map_cells)
-
-        if (self.config.mode == "all" or self.config.mode == "poke"):
-            self._work_on_catchable_pokemon(map_cells)
-
-        if (self.config.mode == "all" or self.config.mode == "poke"):
-            self._work_on_wild_pokemon(map_cells)
-
-        if (self.config.mode == "all" or self.config.mode == "farm") and include_fort_on_path:
-            self._work_on_forts(position, map_cells)
-
-    def _work_on_forts(self, position, map_cells):
-        forts = filtered_forts(position[0], position[1], sum([cell.get("forts", []) for cell in map_cells], []))
-        if forts:
-            worker = SeenFortWorker(forts[0], self)
-            hack_chain = worker.work()
-
-    def _remove_ignored_pokemon(self, map_cells):
-        if self.process_ignored_pokemon:
-            try:
-                for cell in map_cells:
-                    for p in cell['wild_pokemons'][:]:
-                        pokemon_id = p['pokemon_data']['pokemon_id']
-                        pokemon_name = filter(lambda x: int(x.get('Number')) == pokemon_id, self.pokemon_list)[0]['Name']
-
-                        if pokemon_name in ignores:
-                            cell['wild_pokemons'].remove(p)
-            except KeyError:
-                pass
-
-            try:
-                for call in map_cells:
-                    for p in cell['catchable_pokemons'][:]:
-                        pokemon_id = p['pokemon_id']
-                        pokemon_name = filter(lambda x: int(x.get('Number')) == pokemon_id, self.pokemon_list)[0]['Name']
-
-                        if pokemon_name in ignores:
-                            cell['catchable_pokemons'].remove(p)
-            except KeyError:
-                pass
-
-    def _work_on_catchable_pokemon(self, map_cells):
-        for cell in map_cells:
-            if 'catchable_pokemons' in cell and len(cell['catchable_pokemons']) > 0:
-                logger.log('[#] Something rustles nearby!')
-                # Sort all by distance from current pos- eventually this should
-                # build graph & A* it
-                cell['catchable_pokemons'].sort(
-                    key=lambda x: distance(self.position[0], self.position[1], x['latitude'], x['longitude']))
-                for pokemon in cell['catchable_pokemons']:
-                    with open('web/catchable-%s.json' % (self.config.username), 'w') as outfile:
-                        json.dump(pokemon, outfile)
-                    worker = PokemonCatchWorker(pokemon, self)
-                    if worker.work() == -1:
-                        break
-                    with open('web/catchable-%s.json' % (self.config.username), 'w') as outfile:
-                        json.dump({}, outfile)
-
-    def _work_on_wild_pokemon(self, map_cells):
-        for cell in map_cells:
-            if 'wild_pokemons' in cell and len(cell['wild_pokemons']) > 0:
-                # Sort all by distance from current pos- eventually this should
-                # build graph & A* it
-                cell['wild_pokemons'].sort(
-                    key=lambda x: distance(self.position[0], self.position[1], x['latitude'], x['longitude']))
-                for pokemon in cell['wild_pokemons']:
-                    worker = PokemonCatchWorker(pokemon, self)
-                    if worker.work() == -1:
-                        break
+    def work_on_cell(self, **kwargs):
+        self.event_manager.emit_event('before_cell_work', **kwargs)
+        self.event_manager.emit_event('cell_work', **kwargs)
+        self.event_manager.emit_event('after_cell_work', **kwargs)
 
     def _setup_logging(self):
         self.log = logging.getLogger(__name__)
