@@ -4,6 +4,7 @@ import time
 
 from pgoapi.utilities import f2i
 from pokemongo_bot import logger
+from pokemongo_bot.counter import Counter
 from pokemongo_bot.human_behaviour import sleep
 from pokemongo_bot.cell_workers.utils import distance, format_dist, format_time
 
@@ -48,6 +49,7 @@ class SeenFortWorker(object):
         fort_details = response_dict.get("responses", {}).get("FORT_DETAILS", {})
         fort_name = fort_details.get("name").encode("utf8", "replace")
         fort_name = fort_name if fort_name is not None else "Unknown"
+        Counter.visit_pokestop(fort_name)
         logger.log("[#] Now at Pokestop: " + fort_name + " - Spinning...",
                    "yellow")
         sleep(3)
