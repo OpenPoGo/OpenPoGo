@@ -25,22 +25,21 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 Author: tjado <https://github.com/tejado>
 """
 
+from __future__ import print_function
+from getpass import getpass
 import os
-import re
 import json
-import requests
 import argparse
-import time
 import ssl
 import logging
 import sys
 import codecs
 from pokemongo_bot import logger
-from getpass import getpass
 from pokemongo_bot import PokemonGoBot
-from pokemongo_bot.cell_workers.utils import print_green, print_yellow, print_red
 
+# Disable HTTPS certificate verification
 if sys.version_info >= (2, 7, 9):
+    #pylint: disable=protected-access
     ssl._create_default_https_context = ssl._create_unverified_context
 
 
@@ -169,13 +168,11 @@ def main():
 
         logger.log('[x] Starting PokemonGo Bot....', 'green')
 
-        while (True):
+        while True:
             bot.take_step()
 
     except KeyboardInterrupt:
         logger.log('[x] Exiting PokemonGo Bot', 'red')
-        # TODO Add number of pokemon catched, pokestops visited, highest CP
-        # pokemon catched, etc.
 
 
 if __name__ == '__main__':
