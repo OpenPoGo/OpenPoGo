@@ -258,21 +258,17 @@ class PokemonGoBot(object):
 
         for pokemon in inventory_dict:
             try:
-                reduce(dict.__getitem__, [
-                    "inventory_item_data", "pokemon_data", "pokemon_id"
-                ], pokemon)
+                pokemon_data = pokemon['inventory_item_data']['pokemon_data']
+                group_id = pokemon_data['pokemon_id']
+                group_pokemon = pokemon_data['id']
+                group_pokemon_cp = pokemon_data['cp']
+
+                if group_id not in pokemon_groups:
+                    pokemon_groups[group_id] = {}
+
+                pokemon_groups[group_id].update({group_pokemon_cp: group_pokemon})
             except KeyError:
                 continue
-
-            pokemon_data = pokemon['inventory_item_data']['pokemon_data']
-            group_id = pokemon_data['pokemon_id']
-            group_pokemon = pokemon_data['id']
-            group_pokemon_cp = pokemon_data['cp']
-
-            if group_id not in pokemon_groups:
-                pokemon_groups[group_id] = {}
-
-            pokemon_groups[group_id].update({group_pokemon_cp: group_pokemon})
         return pokemon_groups
 
     def update_inventory(self):

@@ -21,7 +21,7 @@ def filtered_forts(lat, lng, forts):
         for fort in forts
         if fort.get('type', None) == 1 and ("enabled" in fort or "lure_info" in fort) and (fort.get('cooldown_complete_timestamp_ms', -1) < time.time() * 1000)
     ]
-    return [x[0] for x in sorted(forts, lambda x, y: cmp(x[1], y[1]))]
+    return [x[0] for x in sorted(forts, lambda x, y: x[1] < y[1])]
 
 
 def convert(original_distance, from_unit, to_unit):  # Converts units

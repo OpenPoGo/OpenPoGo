@@ -27,6 +27,8 @@ Author: tjado <https://github.com/tejado>
 
 from __future__ import print_function
 from getpass import getpass
+#pylint: disable=redefined-builtin
+from builtins import input
 import os
 import json
 import argparse
@@ -127,7 +129,7 @@ def init_config():
 
     config = parser.parse_args()
     if not config.username and 'username' not in load:
-        config.username = raw_input("Username: ")
+        config.username = input("Username: ")
     if not config.password and 'password' not in load:
         config.password = getpass("Password: ")
 

@@ -3,9 +3,9 @@
 import time
 
 from pgoapi.utilities import f2i
-from utils import distance, format_dist, format_time
 from pokemongo_bot import logger
 from pokemongo_bot.human_behaviour import sleep
+from pokemongo_bot.cell_workers.utils import distance, format_dist, format_time
 
 
 class SeenFortWorker(object):
@@ -77,7 +77,7 @@ class SeenFortWorker(object):
                     else:
                         tmp_count_items[item_id] += item["item_count"]
 
-                for item_id, item_count in tmp_count_items.iteritems():
+                for item_id, item_count in tmp_count_items.items():
                     item_id = str(item_id)
                     item_name = self.item_list[item_id]
 
