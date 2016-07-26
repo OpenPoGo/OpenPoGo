@@ -138,6 +138,12 @@ def init_config():
         type=str,
         dest="ign_init_trans")
 
+    parser.add_argument("-ci",
+                        "--continuous-integration",
+                        help="Run the bot in continuous integration mode for testing.",
+                        action="store_true",
+                        dest="ci")
+
     config = parser.parse_args()
 
     if config.json:
@@ -160,8 +166,6 @@ def init_config():
         if config.__dict__.get(key) is None and default_config.get(key) is not None:
             config.__dict__[key] = default_config.get(key)
 
-    print(config.__dict__)
-
     if config.auth_service not in ['ptc', 'google']:
         logging.error("Invalid Auth service specified! ('ptc' or 'google')")
         return None
@@ -170,10 +174,12 @@ def init_config():
         parser.error("Needs either --use-location-cache or --location.")
         return None
 
-    if config.username is None:
-        config.username = input("Username: ")
-    if config.password is None:
-        config.password = getpass("Password: ")
+    if not config.ci:
+        if config.username is None:
+            config.username = input("Username: ")
+        if config.password is None:
+            config.password = getpass("Password: ")
+        print(config.__dict__)
 
     return config
 
