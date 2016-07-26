@@ -17,7 +17,7 @@ def log(string, color='white'):
         'red': '91m'
     }
     if color not in color_hex:
-        print('[' + time.strftime("%Y-%m-%d %H:%M:%S") + '] ' + string)
+        print('[' + time.strftime("%Y-%m-%d %H:%M:%S") + '] ' + string.decode('utf-8'))
     else:
         print(u'\033[' + color_hex[color] + "[" + time.strftime("%Y-%m-%d %H:%M:%S") + '] ' + string.decode('utf-8') + '\033[0m')
     if LCD is not None and string is not None:
