@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import json
 
 from pgoapi.utilities import f2i
 from pokemongo_bot import logger
@@ -45,6 +46,8 @@ class SeenFortWorker(object):
                               latitude=lat,
                               longitude=lng)
         response_dict = self.api.call()
+        with open('initial-response.json', 'w') as outfile:
+            json.dump(response_dict, outfile)
         fort_details = response_dict.get("responses", {}).get("FORT_DETAILS", {})
         fort_name = fort_details.get("name").encode("utf8", "replace") if fort_details.get("name") else fort_details.get("name")
         fort_name = fort_name if fort_name is not None else "Unknown"
@@ -96,6 +99,9 @@ class SeenFortWorker(object):
                                 seconds_since_epoch)))
 
             if not items_awarded and not experience_awarded and not pokestop_cooldown:
+                with open('error.json', 'w') as outfile:
+                    json.dump(response_dict, outfile)
+                print(spin_details)
                 message = (
                     "Stopped at Pokestop and did not find experience, items "
                     "or information about the stop cooldown. You are "

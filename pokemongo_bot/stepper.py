@@ -92,6 +92,8 @@ class Stepper(object):
         # Passing data through last-location and location
         map_objects = response_dict.get("responses", {}).get("GET_MAP_OBJECTS")
         if map_objects is not None:
+            with open("map.json", "w") as outfile:
+                json.dump(map_objects, outfile)
             with open("web/location-{}.json".format(self.config.username), "w") as outfile:
                 json.dump({"lat": lat, "lng": lng, "cells": map_objects.get("map_cells")}, outfile)
             with open("data/last-location-{}.json".format(self.config.username), "w") as outfile:

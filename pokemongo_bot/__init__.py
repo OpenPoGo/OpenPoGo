@@ -8,6 +8,7 @@ import logging
 import random
 import sys
 import threading
+import time
 import yaml
 
 import googlemaps
@@ -48,6 +49,9 @@ class PokemonGoBot(object):
         self.stepper.take_step()
 
     def work_on_cell(self, map_cells, position, include_fort_on_path):
+        # Check if session token has expired
+        self.check_session(position)
+
         self._remove_ignored_pokemon(map_cells)
 
         if self.config.mode == "all" or self.config.mode == "poke":
@@ -136,6 +140,30 @@ class PokemonGoBot(object):
             logging.getLogger("pgoapi").setLevel(logging.ERROR)
             logging.getLogger("rpc_api").setLevel(logging.ERROR)
 
+    def check_session(self, position):
+        # Check session expiry
+        # We will need to fix protected-access. Unfortunately currently no other way to get this information
+        #pylint: disable=protected-access
+        if self.api._auth_provider and self.api._auth_provider._ticket_expire:
+            remaining_time = self.api._auth_provider._ticket_expire/1000 - time.time()
+
+            if remaining_time < 60:
+                logger.log("Session stale, re-logging in", 'yellow')
+                self.position = position
+                self.login()
+
+
+    def login(self):
+        logger.log('[#] Attempting login to Pokemon Go.', 'white')
+        self.api.set_position(*self.position)
+
+        while not self.api.login(self.config.auth_service, str(self.config.username), str(self.config.password)):
+            logger.log('[X] Login Error, server busy', 'red')
+            logger.log('[X] Waiting 10 seconds to try again', 'red')
+            time.sleep(10)
+
+        logger.log('[+] Login to Pokemon Go successful.', 'green')
+
     def _setup_api(self):
         # instantiate pgoapi
         self.api = PGoApi()
@@ -143,11 +171,7 @@ class PokemonGoBot(object):
 
         self._set_starting_position()
 
-        if not self.api.login(self.config.auth_service,
-                              str(self.config.username),
-                              str(self.config.password)):
-            logger.log('Login Error, server busy', 'red')
-            exit(0)
+        self.login()
 
         # chain subrequests (methods) into one RPC call
 

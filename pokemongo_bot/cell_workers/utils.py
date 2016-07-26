@@ -19,7 +19,7 @@ def filtered_forts(lat, lng, forts):
     forts = [(
         fort, distance(lat, lng, fort['latitude'], fort['longitude']))
         for fort in forts
-        if fort.get('type', None) == 1 and ("enabled" in fort or "lure_info" in fort) and (fort.get('cooldown_complete_timestamp_ms', -1) < time.time() * 1000)
+        if fort.get('type', None) == 1 and 'gym_points' not in fort and ("enabled" in fort or "lure_info" in fort) and (fort.get('cooldown_complete_timestamp_ms', -1) < time.time() * 1000)
     ]
     return [x[0] for x in sorted(forts, lambda x, y: x[1] < y[1])]
 
