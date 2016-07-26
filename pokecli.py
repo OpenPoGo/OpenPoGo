@@ -52,7 +52,8 @@ def init_config():
         "pokemon_potential": 0.40,
         "max_steps": 50,
         "distance_unit": "km",
-        "ign_init_trans": ""
+        "ign_init_trans": "",
+        "recycle_items": False
     }
 
     parser = argparse.ArgumentParser()
@@ -115,6 +116,12 @@ def init_config():
         help="Transfer all pokemon with same ID on bot start, except pokemon with highest CP. Respects --cp",
         action="store_true",
         dest="initial_transfer")
+    parser.add_argument(
+        "-ri",
+        "--recycle-items",
+        help="Recycle unneeded items automatically",
+        action="store_true",
+        dest="recycle_items")
     parser.add_argument("-d",
                         "--debug",
                         help="Debug Mode",
