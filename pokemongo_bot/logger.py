@@ -18,9 +18,10 @@ def log(string, color='black', fire_event=True):
         'yellow': '93m',
         'red': '91m'
     }
+    string = string.decode("utf-8")
     if fire_event:
         manager.fire("logging", output=string, color=color)
-    output = '[' + time.strftime("%Y-%m-%d %H:%M:%S") + '] ' + string.decode('utf-8')
+    output = '[' + time.strftime("%Y-%m-%d %H:%M:%S") + '] ' + string
     if color in color_hex:
         output = u"\033[" + color_hex[color] + output + "\033[0m"
     print(output)
