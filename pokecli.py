@@ -39,6 +39,8 @@ from pokemongo_bot import logger
 from pokemongo_bot import PokemonGoBot
 
 # Disable HTTPS certificate verification
+from pokemongo_bot.counter import Counter
+
 if sys.version_info >= (2, 7, 9):
     #pylint: disable=protected-access
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -201,6 +203,10 @@ def main():
 
     except KeyboardInterrupt:
         logger.log('[x] Exiting PokemonGo Bot', 'red')
+        logger.log('[x] Catched Pokemons:', 'green')
+        Counter.print_pokemon()
+        logger.log('[x] Visited Pokestops:', 'green')
+        Counter.print_pokestop()
 
 
 if __name__ == '__main__':

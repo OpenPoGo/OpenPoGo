@@ -4,6 +4,7 @@ from __future__ import print_function
 import random
 import time
 
+from pokemongo_bot.counter import Counter
 from pokemongo_bot.human_behaviour import sleep
 from pokemongo_bot import logger
 
@@ -65,6 +66,7 @@ class PokemonCatchWorker(object):
                     pokemon_name), 'red')
             return False
         elif status is 1:
+            Counter.catch_pokemon(pokemon_name, combat_power)
             if self.should_transfer(combat_power, pokemon_potential):
                 logger.log(
                     '[x] Captured {}! [CP {}] [IV {}] - exchanging for candy'.format(
