@@ -174,6 +174,8 @@ def init_config():
         config.username = input("Username: ")
     if config.password is None:
         config.password = getpass("Password: ")
+    if config.__dict__.get("recycle_items") is None:
+        config.recycle_items = {}
 
     return config
 
