@@ -56,9 +56,9 @@ class SeenFortWorker(object):
 
                     logger.log("[+] " + str(item_count) + "x " + item_name,
                                "green")
-
-                recycle_worker = RecycleItemsWorker(self.bot)
-                recycle_worker.work()
+                if self.config.recycle_items:
+                    recycle_worker = RecycleItemsWorker(self.bot)
+                    recycle_worker.work()
 
             else:
                 logger.log("[#] Nothing found.", "yellow")
