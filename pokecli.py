@@ -163,7 +163,7 @@ def init_config():
     parser.add_argument(
         "-ep",
         "--exclude-plugins",
-        help="Pass a list of plugins to exclude from the loading process (e.g, \"logger,web\").",
+        help="Pass a list of plugins to exclude from the loading process (e.g, logger,web).",
         type=str,
         dest="exclude_plugins")
 
