@@ -109,16 +109,21 @@ def i2f(input_int):
     return struct.unpack('<d', struct.pack('<Q', input_int))[0]
 
 
+# pylint: disable=too-many-return-statements
 def convert_to_utf8(data):
     if isinstance(data, bytes):
-        return data.decode('utf-8')
-    if isinstance(data, (str, int)):
+        return data.decode()
+    elif isinstance(data, str):
         return str(data)
-    if isinstance(data, dict):
+    elif isinstance(data, int):
+        return int(data)
+    elif isinstance(data, float):
+        return float(data)
+    elif isinstance(data, dict):
         return dict(map(convert_to_utf8, data.items()))
-    if isinstance(data, tuple):
+    elif isinstance(data, tuple):
         return tuple(map(convert_to_utf8, data))
-    if isinstance(data, list):
+    elif isinstance(data, list):
         return list(map(convert_to_utf8, data))
-    if isinstance(data, set):
+    elif isinstance(data, set):
         return set(map(convert_to_utf8, data))
