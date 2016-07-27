@@ -129,12 +129,6 @@ def init_config():
         type=float,
         dest="pokemon_potential")
     parser.add_argument(
-        "-if",
-        "--item-filter",
-        help="Pass a list of unwanted items to recycle when collected at a Pokestop (e.g, [\"101\",\"102\",\"103\",\"104\"] to recycle potions when collected)",
-        action="store_true",
-        dest="item_filter")
-    parser.add_argument(
         "-ign",
         "--ign-init-trans",
         help="Pass a list of pokemon to ignore during initial transfer (e.g. 017,049,001)",

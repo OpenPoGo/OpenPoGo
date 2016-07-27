@@ -1,5 +1,6 @@
 from __future__ import print_function
 import time
+import platform
 
 from pokemongo_bot.event_manager import manager
 from pokemongo_bot.utils import convert_to_utf8
@@ -26,6 +27,9 @@ def log(string, color='black', fire_event=True):
     output = '[' + time.strftime("%Y-%m-%d %H:%M:%S") + '] ' + string
     if color in color_hex:
         output = b"\033[" + color_hex[color] + output + b"\033[0m"
-    print(output)
+    if platform.system() == "Windows":
+        print(output.encode('cp437', errors='replace').decode('cp437'))
+    else:
+        print(output)
     if LCD is not None and string is not None:
         LCD.message(string)
