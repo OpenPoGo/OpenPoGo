@@ -25,7 +25,7 @@ class WalkTowardsFortWorker(object):
         dist = distance(self.position[0], self.position[1], lat, lng)
 
         logger.log("[#] Found fort {} at distance {}".format(fort_id, format_dist(dist, unit)))
-
+        self.bot.fire('fort_seen', fort_id=fort_id, distance=format_dist(dist, unit))
         if dist > 0:
             logger.log("[#] Need to move closer to Pokestop")
             position = (lat, lng, 0.0)
@@ -47,3 +47,4 @@ class WalkTowardsFortWorker(object):
         fort_details = response_dict.get("responses", {}).get("FORT_DETAILS", {})
         fort_name = fort_details.get("name") if fort_details.get("name") else "Unknown"
         logger.log(u"[#] Now at Pokestop: " + fort_name)
+        self.bot.fire('fort_arrived', fort_name=fort_name)
