@@ -30,6 +30,14 @@ See [CONTRIBUTING.md](https://github.com/OpenPoGo/OpenPoGoBot/blob/master/CONTRI
  * Use superior ball types when necessary
  * When out of normal pokeballs, use the next type of ball unless there are less than 10 of that type, in which case start automatically farming pokestops
 
+## TODO
+ * Ignore pokemons
+ * Incubate eggs
+ * Max travel from origin
+ * Transfer duplicate (Should be able to prioritize CP or IV)
+ * Catch filter
+ * Recycle items
+ * Display pokemons (Best IV and Best CP)
 
 ## Installation
 
@@ -51,7 +59,6 @@ See [CONTRIBUTING.md](https://github.com/OpenPoGo/OpenPoGoBot/blob/master/CONTRI
 ### Install
 ```
 git clone --recursive https://www.github.com/OpenPoGo/OpenPoGoBot
-cd OpenPoGoBot
 virtualenv env
 source env/bin/activate
 pip install -r requirements.txt
@@ -72,16 +79,13 @@ pip install -r requirements.txt
       -w SPEED,  --walk SPEED                       Walk instead of teleport with given speed (meters per second max 4.16 because of walking end on 15km/h)
       -du UNIT, --distance-unit UNIT                Set the unit to display distance in (e.g, km for kilometers, mi for miles, ft for feet)
       -it, --initial-transfer                       Start the bot with a pokemon clean up, keeping only the higher CP of each pokemon. It respects -c as upper limit to release.
-      -ig LIST, --ign-init-trans LIST               Pass a list of pokemon to ignore during initial transfer (e.g. 017,049,001)
       -ms MAX_STEP, --max-steps MAX_STEP            Set the steps around your initial location (DEFAULT 5 mean 25 cells around your location)
       -cp COMBAT_POWER, --combat-power COMBAT_POWER Transfer Pokemon that have CP less than this value (default 100)",
       -iv IV, --pokemon-potential IV                Set the ratio for the IV values to transfer (DEFAULT 0.4 eg. 0.4 will transfer a pokemon with IV 0.3)
-      -ri, --recycle-items                          Recycle unneeded items automatically
-      -if LIST, --item-filter LIST                  Pass a list of unwanted items to recycle when collected at a Pokestop (e.g, [\"101\",\"102\",\"103\",\"104\"] to recycle potions when collected). Requires --recycle-items. 
-      -ep LIST, --exclude-plugins LIST              Pass a list of plugins to exclude from the loading process (e.g, logger,web).
-      -k KEY, --gmapkey KEY                         Set a google maps API key to use
+      -if LIST, --item-filter LIST                  Pass a list of unwanted items to recycle when collected at a Pokestop (e.g, [\"101\",\"102\",\"103\",\"104\"] to recycle potions when collected)" 
       -d, --debug                                   Debug Mode
       -t, --test                                    Only parse the specified location
+      -if ITEM_FILTER, --item-filter ITEM_FILTER    Filter items to recycle in the form of "id,id,id    "
 
 ### Command Line Example
     Pokemon Trainer Club (PTC) account:
