@@ -23,4 +23,7 @@ class RecycleItemsWorker(object):
                 if amount_to_drop <= 0:
                     continue
                 logger.log("[+] Recycling: {} x {}...".format(self.item_list[str(item["item_id"])], amount_to_drop), 'green')
+                self.bot.fire('recycle_item',
+                              item=self.item_list[str(item["item_id"])],
+                              amount=amount_to_drop)
                 self.bot.drop_item(item["item_id"], amount_to_drop)

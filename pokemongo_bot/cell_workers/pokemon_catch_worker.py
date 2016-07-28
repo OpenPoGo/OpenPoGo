@@ -61,16 +61,24 @@ class PokemonCatchWorker(object):
             logger.log(
                 '[-] Attempted to capture {} - failed.. trying again!'.format(
                     pokemon_name), 'red')
+            self.bot.fire('pokemon_catch_fail',
+                          pokemon_name=pokemon_name)
             sleep(2)
             return True
         elif status is 3:
             logger.log(
                 '[x] Oh no! {} vanished! :('.format(
                     pokemon_name), 'red')
+            self.bot.fire('pokemon_catch_flee',
+                          pokemon_name=pokemon_name)
             return False
         elif status is 1:
             if self.should_transfer(combat_power, pokemon_potential):
-                self.bot.fire('after_catch_pokemon', name=pokemon_name, combat_power=combat_power, pokemon_potential=pokemon_potential)
+                self.bot.fire('after_catch_pokemon',
+                              name=pokemon_name,
+                              combat_power=combat_power,
+                              pokemon_potential=pokemon_potential,
+                              transfered=True)
                 id_list_after_catching = self.get_pokemon_ids()
 
                 # Transfering Pokemon
@@ -79,7 +87,11 @@ class PokemonCatchWorker(object):
                 logger.log(
                     '[#] {} has been exchanged for candy!'.format(pokemon_name), 'green')
             else:
-                self.bot.fire('after_catch_pokemon', name=pokemon_name, combat_power=combat_power, pokemon_potential=pokemon_potential)
+                self.bot.fire('after_catch_pokemon',
+                              name=pokemon_name,
+                              combat_power=combat_power,
+                              pokemon_potential=pokemon_potential,
+                              transfered=False)
             return False
         else:
             return False
@@ -104,6 +116,7 @@ class PokemonCatchWorker(object):
             return  # servers are down
         elif status is 7:
             logger.log('[x] Pokemon Bag is full!', 'red')
+
             return self.BAG_FULL
         elif status is 1:
             combat_power = 0
@@ -122,7 +135,10 @@ class PokemonCatchWorker(object):
                 pokemon_num = int(pokemon['pokemon_data'][
                     'pokemon_id']) - 1
                 pokemon_name = self.pokemon_list[int(pokemon_num)]['Name']
-                self.bot.fire('before_catch_pokemon', name=pokemon_name, combat_power=combat_power if combat_power is not None else "unknown", pokemon_potential=pokemon_potential)
+                self.bot.fire('before_catch_pokemon',
+                              name=pokemon_name,
+                              combat_power=combat_power if combat_power is not None else "unknown",
+                              pokemon_potential=pokemon_potential)
 
                 # Simulate app
                 sleep(3)

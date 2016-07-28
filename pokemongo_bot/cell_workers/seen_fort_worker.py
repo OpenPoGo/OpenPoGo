@@ -35,12 +35,14 @@ class SeenFortWorker(object):
         spin_details = response_dict.get("responses", {}).get("FORT_SEARCH", {})
         spin_result = spin_details.get("result")
         if spin_result == 1:
+            rewards = []
             logger.log("[+] Loot: ", "green")
             experience_awarded = spin_details.get("experience_awarded",
                                                   False)
             if experience_awarded:
                 logger.log("[+] " + str(experience_awarded) + " xp",
                            "green")
+                rewards.append('+ '+ str(experience_awarded) + " xp")
 
             items_awarded = spin_details.get("items_awarded", False)
             if items_awarded:
@@ -58,12 +60,15 @@ class SeenFortWorker(object):
 
                     logger.log("[+] " + str(item_count) + "x " + item_name,
                                "green")
+                    rewards.append('+ ' + str(item_count) + "x "+ item_name)
                 if self.config.recycle_items:
                     recycle_worker = RecycleItemsWorker(self.bot)
                     recycle_worker.work()
 
             else:
                 logger.log("[#] Nothing found.", "yellow")
+
+            self.bot.fire('fort_spinned', rewards=rewards)
 
             pokestop_cooldown = spin_details.get(
                 "cooldown_complete_timestamp_ms")

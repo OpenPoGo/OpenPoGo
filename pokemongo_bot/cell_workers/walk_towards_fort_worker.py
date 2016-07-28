@@ -47,3 +47,4 @@ class WalkTowardsFortWorker(object):
         fort_details = response_dict.get("responses", {}).get("FORT_DETAILS", {})
         fort_name = fort_details.get("name") if fort_details.get("name") else "Unknown"
         logger.log(u"[#] Now at Pokestop: " + fort_name)
+        self.bot.fire('fort_arrived', name=fort_name)
