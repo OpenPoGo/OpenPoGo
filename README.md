@@ -79,6 +79,7 @@ pip install -r requirements.txt
       -ri, --recycle-items                          Recycle unneeded items automatically
       -if LIST, --item-filter LIST                  Pass a list of unwanted items to recycle when collected at a Pokestop (e.g, [\"101\",\"102\",\"103\",\"104\"] to recycle potions when collected). Requires --recycle-items. 
       -ep LIST, --exclude-plugins LIST              Pass a list of plugins to exclude from the loading process (e.g, logger,web).
+      -ev, --evolve-pokemon                         Bot will evolve pokemon whenever enough candies are acquired.
       -k KEY, --gmapkey KEY                         Set a google maps API key to use
       -d, --debug                                   Debug Mode
       -t, --test                                    Only parse the specified location

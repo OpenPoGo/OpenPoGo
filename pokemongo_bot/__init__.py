@@ -36,6 +36,7 @@ class PokemonGoBot(object):
         self.stepper = None
         self.api = None
         self.inventory = []
+        self.candies = {}
         self.ignores = []
         self.position = (0, 0, 0)
         self.plugin_manager = None
@@ -121,6 +122,29 @@ class PokemonGoBot(object):
             transfer_worker.work()
 
         return return_value
+
+    def get_pokemon(self):
+        pokemon_groups = {}
+        self.api.get_player().get_inventory()
+        inventory_req = self.api.call()
+        inventory_dict = inventory_req['responses']['GET_INVENTORY']['inventory_delta']['inventory_items']
+        with open('web/inventory-%s.json' % (self.config.username), 'w') as outfile:
+            json.dump(inventory_dict, outfile)
+
+        for pokemon in inventory_dict:
+            try:
+                pokemon_data = pokemon['inventory_item_data']['pokemon_data']
+                group_id = pokemon_data['pokemon_id']
+                group_pokemon = pokemon_data['id']
+                group_pokemon_cp = pokemon_data['cp']
+
+                if group_id not in pokemon_groups:
+                    pokemon_groups[group_id] = {}
+
+                pokemon_groups[group_id].update({group_pokemon_cp: group_pokemon})
+            except KeyError:
+                continue
+        return pokemon_groups
 
     def _work_on_forts(self, position, map_cells):
         forts = filtered_forts(position[0], position[1], sum([cell.get("forts", []) for cell in map_cells], []))
@@ -303,6 +327,7 @@ class PokemonGoBot(object):
 
         logger.log('[#]')
         self.update_inventory()
+        logger.log('[#]')
 
     def print_player_data(self, player):
         # @@@ TODO: Convert this to d/m/Y H:M:S
@@ -349,6 +374,7 @@ class PokemonGoBot(object):
         response = self.api.call()
         self.inventory = list()
         inventory_items = response.get('responses', {}).get('GET_INVENTORY', {}).get('inventory_delta', {}).get('inventory_items')
+        self.update_candies(inventory_items=inventory_items)
         if inventory_items is None:
             return
         for item in inventory_items:
@@ -356,6 +382,34 @@ class PokemonGoBot(object):
             if item_data is None or 'item_id' not in item_data or 'count' not in item_data:
                 continue
             self.inventory.append(item_data)
+
+    def update_candies(self, inventory_items):
+        if inventory_items is None:
+            return
+        for item in inventory_items:
+            pokemon_candies = item.get('inventory_item_data', {}).get('pokemon_family')
+            if pokemon_candies is None or 'family_id' not in pokemon_candies or 'candy' not in pokemon_candies:
+                continue
+            self.candies[pokemon_candies['family_id']] = pokemon_candies['candy']
+        self._candies_use_name()
+
+    def add_candies(self, name=None, pokemon_candies=None):
+        for pokemon in self.pokemon_list:
+            if pokemon['Name'] is not name:
+                continue
+            else:
+                previous_evolutions = pokemon.get("Previous evolution(s)", [])
+                if previous_evolutions:
+                    candy_name = previous_evolutions[0]['Name']
+                else:
+                    candy_name = name
+
+                if self.candies.get(candy_name, None) is not None:
+                    self.candies[candy_name] += pokemon_candies
+                else:
+                    self.candies[candy_name] = pokemon_candies
+                logger.log("[#] Added {} candies for {}".format(pokemon_candies, candy_name), 'green')
+                break
 
     def pokeball_inventory(self):
         self.api.get_player().get_inventory()
@@ -382,6 +436,15 @@ class PokemonGoBot(object):
                 if item_id in balls_stock:
                     balls_stock[item_id] = item_count
         return balls_stock
+
+    def _candies_use_name(self):
+        for pokemon in self.pokemon_list:
+            poke_number = int(pokemon['Number'])
+            if self.candies.get(poke_number, None) is not None:
+                self.candies[pokemon['Name']] = self.candies[poke_number]
+                del self.candies[poke_number]
+            else:
+                continue
 
     def _set_starting_position(self):
 

@@ -12,6 +12,7 @@
     "pokemon_potential": 0.70,
     "location_cache": true,
     "distance_unit": "km",
+    "evolve_pokemon": false,
     "item_filter": {
         "1": { "keep": 50 },
         "101": { "keep": 10 },

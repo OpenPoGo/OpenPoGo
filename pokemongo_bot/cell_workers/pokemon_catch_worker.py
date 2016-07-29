@@ -69,17 +69,23 @@ class PokemonCatchWorker(object):
                     pokemon_name), 'red')
             return False
         elif status is 1:
+            self.bot.add_candies(name=pokemon_name, pokemon_candies=pokemon_catch_response['capture_award']['candy'][0])
+
             if self.should_transfer(combat_power, pokemon_potential):
-                self.bot.fire('after_catch_pokemon', name=pokemon_name, combat_power=combat_power, pokemon_potential=pokemon_potential)
+                self.bot.fire('after_catch_pokemon', name=pokemon_name, combat_power=combat_power,
+                              pokemon_potential=pokemon_potential)
                 id_list_after_catching = self.get_pokemon_ids()
 
                 # Transfering Pokemon
                 pokemon_to_transfer = list(set(id_list_after_catching) - set(id_list_before_catching))
                 self.transfer_pokemon(pokemon_to_transfer[0])
+                self.bot.add_candies(name=pokemon_name, pokemon_candies=1)
                 logger.log(
                     '[#] {} has been exchanged for candy!'.format(pokemon_name), 'green')
+                self.bot.fire('after_transfer_pokemon', name=pokemon_name)
             else:
-                self.bot.fire('after_catch_pokemon', name=pokemon_name, combat_power=combat_power, pokemon_potential=pokemon_potential)
+                self.bot.fire('after_catch_pokemon', name=pokemon_name, combat_power=combat_power,
+                              pokemon_potential=pokemon_potential)
             return False
         else:
             return False

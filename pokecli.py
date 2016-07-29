@@ -56,6 +56,7 @@ def init_config():
         "recycle_items": False,
         "location_cache": False,
         "initial_transfer": False,
+        "evolve_pokemon": False,
         "debug": False,
         "test": False
     }
@@ -168,6 +169,14 @@ def init_config():
         help="Pass a list of plugins to exclude from the loading process (e.g, logger,web).",
         type=str,
         dest="exclude_plugins")
+
+    parser.add_argument(
+        "-ev",
+        "--evolve-pokemon",
+        help="Bot will evolve pokemon whenever enough candies are acquired.",
+        dest="evolve_pokemon",
+        default=None
+    )
 
     config = parser.parse_args()
 
