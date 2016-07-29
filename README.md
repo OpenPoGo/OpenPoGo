@@ -30,6 +30,13 @@ See [CONTRIBUTING.md](https://github.com/OpenPoGo/OpenPoGoBot/blob/master/CONTRI
  * Use superior ball types when necessary
  * When out of normal pokeballs, use the next type of ball unless there are less than 10 of that type, in which case start automatically farming pokestops
 
+## TODO
+ * Ignore pokemons
+ * Incubate eggs
+ * Max travel from origin
+ * Transfer duplicate (Should be able to prioritize CP or IV)
+ * Catch filter
+ * Display pokemons (Best IV and Best CP)
 
 ## Installation
 
@@ -82,6 +89,7 @@ pip install -r requirements.txt
       -k KEY, --gmapkey KEY                         Set a google maps API key to use
       -d, --debug                                   Debug Mode
       -t, --test                                    Only parse the specified location
+
 
 ### Command Line Example
     Pokemon Trainer Club (PTC) account:
