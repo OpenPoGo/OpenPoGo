@@ -3,8 +3,8 @@
 from pokemongo_bot import logger
 
 
+# TODO: Use API wrapper
 class RecycleItemsWorker(object):
-
     def __init__(self, bot):
         self.api = bot.api
         self.bot = bot
@@ -22,5 +22,6 @@ class RecycleItemsWorker(object):
                 amount_to_drop = item["count"] - amount_to_keep
                 if amount_to_drop <= 0:
                     continue
-                logger.log("[+] Recycling: {} x {}...".format(self.item_list[str(item["item_id"])], amount_to_drop), 'green')
+                logger.log("[+] Recycling: {} x {}...".format(self.item_list[str(item["item_id"])], amount_to_drop),
+                           'green')
                 self.bot.drop_item(item["item_id"], amount_to_drop)

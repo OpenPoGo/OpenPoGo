@@ -2,10 +2,9 @@
 
 import time
 
-from pgoapi.utilities import f2i
 from pokemongo_bot import logger
 from pokemongo_bot.human_behaviour import sleep
-from pokemongo_bot.utils import format_time
+from pokemongo_bot.utils import format_time, f2i
 from pokemongo_bot.cell_workers.recycle_items_worker import RecycleItemsWorker
 
 
@@ -13,26 +12,28 @@ class SeenFortWorker(object):
 
     def __init__(self, fort, bot):
         self.fort = fort
-        self.api = bot.api
+        self.api_wrapper = bot.api_wrapper
         self.bot = bot
         self.position = bot.position
         self.config = bot.config
         self.item_list = bot.item_list
 
     def work(self):
-        lat = self.fort["latitude"]
-        lng = self.fort["longitude"]
+        lat = self.fort.latitude
+        lng = self.fort.longitude
         logger.log("Spinning...", "yellow")
         sleep(3)
-        self.api.fort_search(fort_id=self.fort["id"],
+        self.api_wrapper.fort_search(fort_id=self.fort.fort_id,
                              fort_latitude=lat,
                              fort_longitude=lng,
-                             player_latitude=f2i(self.position[0]),
-                             player_longitude=f2i(self.position[1]))
-        response_dict = self.api.call()
+                             player_latitude=self.position[0],
+                             player_longitude=self.position[1])
+        response_dict = self.api_wrapper.call()
         if response_dict is None:
             return
-        spin_details = response_dict.get("responses", {}).get("FORT_SEARCH", {})
+        # TODO: Fix the rest of this
+
+        spin_details = response_dict["FORT_SEARCH"]
         spin_result = spin_details.get("result")
         if spin_result == 1:
             logger.log("[+] Loot: ", "green")

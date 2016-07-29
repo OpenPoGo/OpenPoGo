@@ -13,6 +13,7 @@ logging.getLogger('socketio').disabled = True
 logging.getLogger('engineio').disabled = True
 logging.getLogger('werkzeug').disabled = True
 
+
 def run_flask():
     root_dir = os.path.join(os.getcwd(), 'web')
     app = Flask(__name__, static_folder=root_dir)
@@ -47,6 +48,7 @@ def run_flask():
         logger.log("Client disconnected", "yellow", fire_event=False)
 
     socketio.run(app, host="0.0.0.0", port=8000, debug=False, use_reloader=False, log_output=False)
+
 
 WEB_THREAD = Thread(target=run_flask)
 WEB_THREAD.daemon = True
