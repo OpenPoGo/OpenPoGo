@@ -90,9 +90,9 @@ class PokemonCatchWorker(object):
         player_latitude = self.pokemon['latitude']
         player_longitude = self.pokemon['longitude']
         self.api_wrapper.encounter(encounter_id=encounter_id,
-                           spawn_point_id=spawnpoint_id,
-                           player_latitude=player_latitude,
-                           player_longitude=player_longitude)
+                                   spawn_point_id=spawnpoint_id,
+                                   player_latitude=player_latitude,
+                                   player_longitude=player_longitude)
         response_dict = self.api_wrapper.call()
 
         if response_dict is None:
@@ -106,7 +106,6 @@ class PokemonCatchWorker(object):
             logger.log('[x] Pokemon Bag is full!', 'red')
             return self.BAG_FULL
         elif status is 1:
-            combat_power = 0
             pokemon = encounter.wild_pokemon
 
             if pokemon is None:

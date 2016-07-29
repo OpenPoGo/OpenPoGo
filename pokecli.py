@@ -93,7 +93,7 @@ def init_config():
     parser.add_argument(
         "-w",
         "--walk",
-        help=" Walk instead of teleport with given speed (meters per second max 4.16 because of walking end on 15km/h)",
+        help="Walk instead of teleport with given speed (meters per second max 4.16 because of walking end on 15km/h)",
         type=float,
         dest="walk")
     parser.add_argument(

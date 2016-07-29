@@ -9,7 +9,6 @@ from pokemongo_bot.cell_workers.recycle_items_worker import RecycleItemsWorker
 
 
 class SeenFortWorker(object):
-
     def __init__(self, fort, bot):
         self.fort = fort
         self.api_wrapper = bot.api_wrapper
@@ -24,10 +23,10 @@ class SeenFortWorker(object):
         logger.log("Spinning...", "yellow")
         sleep(3)
         self.api_wrapper.fort_search(fort_id=self.fort.fort_id,
-                             fort_latitude=lat,
-                             fort_longitude=lng,
-                             player_latitude=self.position[0],
-                             player_longitude=self.position[1])
+                                     fort_latitude=lat,
+                                     fort_longitude=lng,
+                                     player_latitude=self.position[0],
+                                     player_longitude=self.position[1])
         response_dict = self.api_wrapper.call()
         if response_dict is None:
             return
@@ -67,12 +66,12 @@ class SeenFortWorker(object):
                 logger.log("[#] Nothing found.", "yellow")
 
             pokestop_cooldown = spin_details.get(
-                "cooldown_complete_timestamp_ms")
+                    "cooldown_complete_timestamp_ms")
             if pokestop_cooldown:
                 seconds_since_epoch = time.time()
                 logger.log("[#] PokeStop on cooldown. Time left: " + str(
-                    format_time((pokestop_cooldown / 1000) -
-                                seconds_since_epoch)))
+                        format_time((pokestop_cooldown / 1000) -
+                                    seconds_since_epoch)))
 
             if not items_awarded and not experience_awarded and not pokestop_cooldown:
                 message = (
@@ -87,12 +86,12 @@ class SeenFortWorker(object):
             logger.log("[#] Pokestop out of range")
         elif spin_result == 3:
             pokestop_cooldown = spin_details.get(
-                "cooldown_complete_timestamp_ms")
+                    "cooldown_complete_timestamp_ms")
             if pokestop_cooldown:
                 seconds_since_epoch = time.time()
                 logger.log("[#] PokeStop on cooldown. Time left: " + str(
-                    format_time((pokestop_cooldown / 1000) -
-                                seconds_since_epoch)))
+                        format_time((pokestop_cooldown / 1000) -
+                                    seconds_since_epoch)))
         elif spin_result == 4:
             logger.log("[#] Inventory is full, switching to catch mode...", "red")
             self.config.mode = "poke"

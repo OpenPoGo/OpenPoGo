@@ -2,9 +2,9 @@ from threading import Thread
 import os
 import logging
 from flask import Flask, request, jsonify, render_template, send_from_directory
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, emit
 
-from pokemongo_bot import logger, event_manager
+from pokemongo_bot import logger
 from pokemongo_bot.event_manager import manager
 
 # pylint: disable=unused-variable, unused-argument

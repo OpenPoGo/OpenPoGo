@@ -39,8 +39,8 @@ class WalkTowardsFortWorker(object):
             sleep(2)
 
         self.api_wrapper.fort_details(fort_id=fort_id,
-                              latitude=lat,
-                              longitude=lng)
+                                      latitude=lat,
+                                      longitude=lng)
         response_dict = self.api_wrapper.call()
         if response_dict is None:
             return
