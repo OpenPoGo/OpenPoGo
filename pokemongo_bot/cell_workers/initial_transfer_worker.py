@@ -9,6 +9,7 @@ class InitialTransferWorker(object):
         self.config = bot.config
         self.pokemon_list = bot.pokemon_list
         self.api = bot.api
+        self.bot = bot
 
     def work(self):
         logger.log('[x] Initial Transfer.')
@@ -39,6 +40,7 @@ class InitialTransferWorker(object):
                     if (self.config.cp and group_cp[i] > self.config.cp) or (pokemon_name in ignlist or pokemon_num in ignlist):
                         continue
 
+                    self.bot.fire('pokemon_transfered', pokemon=pokemon_name, cp=group_cp[i])
                     logger.log('[x] Transferring #{} ({}) with CP {}'.format(group_id, pokemon_name, group_cp[i]))
                     self.api.release_pokemon(pokemon_id=pokemon_groups[group_id][group_cp[i]])
 
@@ -49,6 +51,7 @@ class InitialTransferWorker(object):
                     sleep(2)
 
         logger.log('[x] Transferring Done.')
+        self.bot.fire('transfer_finished')
 
     def _initial_transfer_get_groups(self):
         pokemon_groups = {}

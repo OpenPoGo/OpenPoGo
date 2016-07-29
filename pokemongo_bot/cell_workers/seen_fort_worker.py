@@ -23,6 +23,7 @@ class SeenFortWorker(object):
         lat = self.fort["latitude"]
         lng = self.fort["longitude"]
         logger.log("Spinning...", "yellow")
+        self.bot.fire('fort_spinning')
         sleep(3)
         self.api.fort_search(fort_id=self.fort["id"],
                              fort_latitude=lat,
@@ -34,6 +35,7 @@ class SeenFortWorker(object):
             return
         spin_details = response_dict.get("responses", {}).get("FORT_SEARCH", {})
         spin_result = spin_details.get("result")
+        rewards = {}
         if spin_result == 1:
             logger.log("[+] Loot: ", "green")
             experience_awarded = spin_details.get("experience_awarded",
@@ -41,6 +43,7 @@ class SeenFortWorker(object):
             if experience_awarded:
                 logger.log("[+] " + str(experience_awarded) + " xp",
                            "green")
+                rewards['XP'] = experience_awarded
 
             items_awarded = spin_details.get("items_awarded", False)
             if items_awarded:
@@ -58,6 +61,7 @@ class SeenFortWorker(object):
 
                     logger.log("[+] " + str(item_count) + "x " + item_name,
                                "green")
+                    rewards[item_name] = item_count
                 if self.config.recycle_items:
                     recycle_worker = RecycleItemsWorker(self.bot)
                     recycle_worker.work()
@@ -65,6 +69,7 @@ class SeenFortWorker(object):
             else:
                 logger.log("[#] Nothing found.", "yellow")
 
+            self.bot.fire('fort_spinned', rewards=rewards)
             pokestop_cooldown = spin_details.get(
                 "cooldown_complete_timestamp_ms")
             if pokestop_cooldown:
@@ -94,6 +99,7 @@ class SeenFortWorker(object):
                                 seconds_since_epoch)))
         elif spin_result == 4:
             logger.log("[#] Inventory is full, switching to catch mode...", "red")
+            self.bot.fire('inventory_full')
             self.config.mode = "poke"
 
         sleep(2)

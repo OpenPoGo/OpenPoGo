@@ -69,6 +69,7 @@ class PokemonGoBot(object):
 
         if (self.config.mode == "all" or self.config.mode == "poke") and 'catchable_pokemons' in cell and len(cell['catchable_pokemons']) > 0:
             logger.log('[#] Something rustles nearby!')
+            self.fire('pokemon_nearby')
             # Sort all by distance from current pos- eventually this should
             # build graph & A* it
             cell['catchable_pokemons'].sort(key=lambda x: distance(self.position[0], self.position[1], x['latitude'], x['longitude']))
@@ -204,6 +205,7 @@ class PokemonGoBot(object):
                               str(self.config.username),
                               str(self.config.password)):
             logger.log('Login Error, server busy', 'red')
+            self.fire('player_login_err', username=self.config.username)
             exit(0)
 
         # chain subrequests (methods) into one RPC call
@@ -240,9 +242,12 @@ class PokemonGoBot(object):
             logger.log('[#] PokeBalls: {}'.format(balls_stock[1]))
             logger.log('[#] GreatBalls: {}'.format(balls_stock[2]))
             logger.log('[#] UltraBalls: {}'.format(balls_stock[3]))
+            self.fire('player_loggedin', player=player)
         # Testing
         # self.drop_item(Item.ITEM_POTION.value,1)
         # exit(0)
+
+
         self.get_player_info()
 
         if self.config.initial_transfer:
