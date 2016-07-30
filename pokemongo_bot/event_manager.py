@@ -1,52 +1,81 @@
 from __future__ import print_function
+import inspect
 
 
 class Event(object):
     def __init__(self, name):
         self.name = name
-        self.listeners = set()
+        self.listeners = {}
         print("Initialized new event: " + name)
 
-    def add_listener(self, listener):
-        self.listeners.add(listener)
+    def add_listener(self, listener, priority=0):
+        if priority not in self.listeners:
+            self.listeners[priority] = set()
+        self.listeners[priority].add(listener)
 
     def remove_listener(self, listener):
-        self.listeners.discard(listener)
+        for priority in self.listeners:
+            self.listeners[priority].discard(listener)
 
-    def fire(self, *args, **kwargs):
-        for listener in self.listeners:
-            listener(self.name, *args, **kwargs)
+    def fire(self, **kwargs):
+        # Sort events by priorities from greatest to least
+        priorities = sorted(self.listeners, key=lambda event_priority: event_priority * -1)
+        for priority in priorities:
+            for listener in self.listeners[priority]:
+
+                # Pass in the event name to the handler
+                kwargs["event_name"] = self.name
+
+                # Slice off any named arguments that the handler doesn't need
+                argspec = inspect.getargspec(listener)
+
+                if not argspec.args:
+                    return_dict = listener()
+                else:
+                    listener_args = {}
+                    for key in argspec.args:
+                        listener_args[key] = kwargs.get(key)
+                    return_dict = listener(**listener_args)
+
+                # Update the list of arguments to be used for the next function
+                # This enables "pipeline"-like functionality - if arguments to an event handler
+                # need to be processed in some way, another handler with higher priority can be
+                # installed beforehand to do this without touching the original handler.
+                if return_dict is not None:
+                    kwargs.update(return_dict)
+        return kwargs
 
 
 class EventManager(object):
     def __init__(self):
         self.events = {}
 
-    def add_listener(self, name, listener):
+    def add_listener(self, name, listener, priority=0):
         if name not in self.events:
             self.events[name] = Event(name)
-        self.events[name].add_listener(listener)
+        self.events[name].add_listener(listener, priority)
 
-    # decorator for event handlers
+    # Decorator for event handlers.
+    # Higher priority events run before lower priority ones.
     # pylint: disable=invalid-name
-    def on(self, *trigger_list):
+    def on(self, *trigger_list, priority=0):
         def register_handler(function):
             for trigger in trigger_list:
-                self.add_listener(trigger, function)
+                self.add_listener(trigger, function, priority)
             return function
 
         return register_handler
 
-    # fire an event and call all event handlers
+    # Fire an event and call all event handlers.
     def fire(self, event_name, *args, **kwargs):
         if event_name in self.events:
-            self.events[event_name].fire(*args, **kwargs)
+            return self.events[event_name].fire(*args, **kwargs)
 
-    # fire an event and call all event handlers, injecting the context as 2nd parameter
+    # Fire an event and call all event handlers, injecting the bot context as a named parameter.
     def fire_with_context(self, event_name, bot, *args, **kwargs):
         if event_name in self.events:
             kwargs['bot'] = bot
-            self.fire(event_name, *args, **kwargs)
+            return self.fire(event_name, *args, **kwargs)
 
     def remove_listener(self, name, listener):
         if name in self.events:
