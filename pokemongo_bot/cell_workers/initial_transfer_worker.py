@@ -39,8 +39,13 @@ class InitialTransferWorker(object):
                     if (self.config.cp and group_cp[i] > self.config.cp) or (pokemon_name in ignlist or pokemon_num in ignlist):
                         continue
 
-                    logger.log('[x] Transferring #{} ({}) with CP {}'.format(group_id, pokemon_name, group_cp[i]))
-                    self.api.release_pokemon(pokemon_id=pokemon_groups[group_id][group_cp[i]])
+                    logger.log('[x] Trying to Evolve #:{} ({}) with CP {}'.format(group_id, pokemon_name, group_cp[i]))
+                    try:
+                        self.api.evolve_pokemon(pokemon_id=pokemon_groups[group_id][group_cp[i]])
+                    except:
+                        logger.log('[x] Could not evolve', "yellow")
+                        logger.log('[x] Transferring #:{} ({}) with CP {}'.format(group_id, pokemon_name, group_cp[i]))
+                        self.api.release_pokemon(pokemon_id=pokemon_groups[group_id][group_cp[i]])
 
                     # Not using the response from API at the moment; commenting out to pass pylint
                     # response_dict = self.api.call()

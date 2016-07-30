@@ -6,9 +6,11 @@ from random import random, randint
 
 
 def sleep(seconds, delta=0.3):
+    if(seconds > 5):
+        seconds = 5
     jitter = ceil(delta * seconds)
     sleep_time = randint(int(seconds - jitter), int(seconds + jitter))
-    time.sleep(sleep_time)
+    time.sleep(sleep_time / 3)
 
 
 def random_lat_long_delta(factor=10):

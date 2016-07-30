@@ -176,7 +176,17 @@ class PokemonCatchWorker(object):
                     time.sleep(1.2)
 
     def transfer_pokemon(self, pid):
-        self.api.release_pokemon(pokemon_id=pid)
+        try:
+            logging.info("Trying to evolve before transferring: {}".format(pid))
+            self.evolve_pokemon(pid)
+        except:
+            self.api.release_pokemon(pokemon_id=pid)
+            # Why do we need response_dict? Commenting out to pass pylint
+            # response_dict = self.api.call()
+            self.api.call()
+
+    def evolve_pokemon(self, pid):
+        self.api.evolve_pokemon(pokemon_id=pid)
         # Why do we need response_dict? Commenting out to pass pylint
         # response_dict = self.api.call()
         self.api.call()

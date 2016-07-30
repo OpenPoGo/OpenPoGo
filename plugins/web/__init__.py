@@ -6,14 +6,14 @@ from flask_socketio import SocketIO, send, emit
 
 from pokemongo_bot import logger, event_manager
 from pokemongo_bot.event_manager import manager
-
 # pylint: disable=unused-variable, unused-argument
+from pokecli import init_config
 
 logging.getLogger('socketio').disabled = True
 logging.getLogger('engineio').disabled = True
 logging.getLogger('werkzeug').disabled = True
 
-def run_flask():
+def run_flask(host, port):
     root_dir = os.path.join(os.getcwd(), 'web')
     app = Flask(__name__, static_folder=root_dir)
     app.use_reloader = False
@@ -46,8 +46,9 @@ def run_flask():
     def disconnect():
         logger.log("Client disconnected", "yellow", fire_event=False)
 
-    socketio.run(app, host="0.0.0.0", port=8000, debug=False, use_reloader=False, log_output=False)
+    socketio.run(app, host=host, port=port, debug=False, use_reloader=False, log_output=False)
 
-WEB_THREAD = Thread(target=run_flask)
+config = init_config()
+WEB_THREAD = Thread(target=run_flask, args=(config.host, config.port))
 WEB_THREAD.daemon = True
 WEB_THREAD.start()
