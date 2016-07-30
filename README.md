@@ -78,7 +78,6 @@ pip install -r requirements.txt
       -cp COMBAT_POWER, --combat-power COMBAT_POWER Transfer Pokemon that have CP less than this value (default 100)",
       -iv IV, --pokemon-potential IV                Set the ratio for the IV values to transfer (DEFAULT 0.4 eg. 0.4 will transfer a pokemon with IV 0.3)
       -ri, --recycle-items                          Recycle unneeded items automatically
-      -if LIST, --item-filter LIST                  Pass a list of unwanted items to recycle when collected at a Pokestop (e.g, [\"101\",\"102\",\"103\",\"104\"] to recycle potions when collected). Requires --recycle-items. 
       -ep LIST, --exclude-plugins LIST              Pass a list of plugins to exclude from the loading process (e.g, logger,web).
       -k KEY, --gmapkey KEY                         Set a google maps API key to use
       -gd, --google-directions                      Bot will use directions from google maps API to navigate
