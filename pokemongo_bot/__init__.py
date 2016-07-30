@@ -295,7 +295,10 @@ class PokemonGoBot(object):
         stardust = player['currencies'][1].get('amount', '0')
 
         logger.log('[#]')
-        logger.log('[#] Username: {username}'.format(**player))
+        if self.config.ci is False:
+            logger.log('[#] Username: {username}'.format(**player))
+        else:
+            logger.log('[#] Username is hidden (running in CI mode)')
         logger.log('[#] Account Creation: {}'.format(creation_date))
         logger.log('[#] Bag Storage: {}/{}'.format(self.get_item_count(), player['max_item_storage']))
         logger.log('[#] Pokemon Storage: {}/{}'.format(self.get_pokemon_count(), player['max_pokemon_storage']))

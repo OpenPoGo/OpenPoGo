@@ -57,7 +57,8 @@ def init_config():
         "location_cache": False,
         "initial_transfer": False,
         "debug": False,
-        "test": False
+        "test": False,
+        "continuous_integration": False
     }
 
     parser = argparse.ArgumentParser()
@@ -168,13 +169,19 @@ def init_config():
         action="store_true",
         dest="test",
         default=None)
-
     parser.add_argument(
         "-ep",
         "--exclude-plugins",
         help="Pass a list of plugins to exclude from the loading process (e.g, logger,web).",
         type=str,
         dest="exclude_plugins")
+    parser.add_argument(
+        "-ci",
+        "--continuous-integration",
+        help="Run the bot in continuous integration mode for testing.",
+        action="store_true",
+        dest="ci",
+        default=None)
 
     config = parser.parse_args()
 
@@ -200,8 +207,6 @@ def init_config():
 
     config.exclude_plugins = config.exclude_plugins.split(",")
 
-    print(config.__dict__)
-
     if config.auth_service not in ['ptc', 'google']:
         logging.error("Invalid Auth service specified! ('ptc' or 'google')")
         return None
@@ -210,10 +215,14 @@ def init_config():
         parser.error("Needs either --use-location-cache or --location.")
         return None
 
-    if config.username is None:
-        config.username = input("Username: ")
-    if config.password is None:
-        config.password = getpass("Password: ")
+    if config.ci is False:
+        print(config.__dict__)
+        if config.username is None:
+            config.username = input("Username: ")
+        if config.password is None:
+            config.password = getpass("Password: ")
+    else:
+        print("Running in continuous integration mode; not printing sensitive information.")
 
     return config
 
