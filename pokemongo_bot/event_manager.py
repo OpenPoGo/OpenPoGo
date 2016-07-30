@@ -6,9 +6,11 @@ class Event(object):
     def __init__(self, name):
         self.name = name
         self.listeners = {}
-        print("Initialized new event: " + name)
+        self.num_listeners = 0
+        print("[Event Manager] Initialized new event \"{}\"".format(self.name))
 
     def add_listener(self, listener, priority=0):
+        self.num_listeners += 1
         if priority not in self.listeners:
             self.listeners[priority] = set()
         self.listeners[priority].add(listener)
@@ -16,8 +18,12 @@ class Event(object):
     def remove_listener(self, listener):
         for priority in self.listeners:
             self.listeners[priority].discard(listener)
+        self.num_listeners -= 1
 
     def fire(self, **kwargs):
+        if self.num_listeners == 0:
+            print("[Event Manager] WARNING: No handler has registered to handle event \"{}\"".format(self.name))
+
         # Sort events by priorities from greatest to least
         priorities = sorted(self.listeners, key=lambda event_priority: event_priority * -1)
         for priority in priorities:
@@ -27,6 +33,7 @@ class Event(object):
                 kwargs["event_name"] = self.name
 
                 # Slice off any named arguments that the handler doesn't need
+                # pylint: disable=deprecated-method
                 argspec = inspect.getargspec(listener)
 
                 if not argspec.args:
@@ -50,18 +57,21 @@ class EventManager(object):
     def __init__(self):
         self.events = {}
 
-    def add_listener(self, name, listener, priority=0):
+    def add_listener(self, name, listener, **kwargs):
         if name not in self.events:
             self.events[name] = Event(name)
+        priority = kwargs.get("priority", 0)
         self.events[name].add_listener(listener, priority)
 
     # Decorator for event handlers.
     # Higher priority events run before lower priority ones.
     # pylint: disable=invalid-name
-    def on(self, *trigger_list, priority=0):
+    def on(self, *trigger_list, **kwargs):
+        priority = kwargs.get("priority", 0)
+
         def register_handler(function):
             for trigger in trigger_list:
-                self.add_listener(trigger, function, priority)
+                self.add_listener(trigger, function, priority=priority)
             return function
 
         return register_handler

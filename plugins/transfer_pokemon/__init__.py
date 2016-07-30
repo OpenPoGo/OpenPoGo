@@ -1,6 +1,5 @@
 from pokemongo_bot.human_behaviour import sleep
 from pokemongo_bot.event_manager import manager
-from pokemongo_bot import logger
 
 
 def log(text, color="black"):
@@ -31,7 +30,7 @@ def filter_pokemon(bot=None, transfer_list=None):
 
     if bot.config.cp and False:
         ignore_list = bot.config.ign_init_trans.split(',')
-        log("Transfer any Pokemon below {} CP, excluding {}.".format(bot.config.cp, ignore_list))
+        log("Transferring all Pokemon below {} CP, excluding {}.".format(bot.config.cp, ignore_list))
 
         groups = indexed_pokemon.keys()
         for group in groups:
@@ -62,18 +61,21 @@ def filter_pokemon(bot=None, transfer_list=None):
 
 
 @manager.on("pokemon_bag_full", "transfer_pokemon", priority=0)
-def transfer_pokemon(bot=None, transfer_list=list()):
+def transfer_pokemon(bot=None, transfer_list=None):
     # type: (PokemonGoBot, Optional[List[Pokemon]]) -> None
+
+    if transfer_list is None or len(transfer_list) == 0:
+        log("No Pokemon to transfer.", color="yellow")
 
     for index, pokemon in enumerate(transfer_list):
         pokemon_num = pokemon.pokemon_id
         pokemon_name = bot.pokemon_list[pokemon_num - 1]["Name"]
         pokemon_cp = pokemon.combat_power
         log("Transferring {0} (#{1}) with CP {2} ({3}/{4})".format(pokemon_name,
-                                                                              pokemon_num,
-                                                                              pokemon_cp,
-                                                                              index+1,
-                                                                              len(transfer_list)))
+                                                                   pokemon_num,
+                                                                   pokemon_cp,
+                                                                   index+1,
+                                                                   len(transfer_list)))
 
         bot.api_wrapper.release_pokemon(pokemon_id=pokemon.unique_id).call()
         sleep(2)
