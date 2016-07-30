@@ -1,11 +1,11 @@
 from __future__ import print_function
 import time
 
+from six import integer_types
 from pgoapi import PGoApi                                           # type: ignore
 from pgoapi.exceptions import ServerSideRequestThrottlingException  # type: ignore
-from .state_manager import StateManager
-from six import integer_types
 
+from .state_manager import StateManager
 
 class PoGoApi(object):
     def __init__(self, provider="google", username="", password=""):

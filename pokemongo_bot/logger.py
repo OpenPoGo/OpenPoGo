@@ -1,10 +1,10 @@
+# pylint: disable=redefined-builtin
 from __future__ import print_function
 from builtins import str
 import time
 
 from colorama import init, Fore, Back, Style
 from pokemongo_bot.event_manager import manager
-from pokemongo_bot.utils import convert_to_utf8
 
 # Uncomment for type annotations on Python 3
 # from typing import Optional
