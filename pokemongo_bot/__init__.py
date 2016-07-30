@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-from typing import Any, List, Dict, Union, Tuple
 import datetime
 import json
 import logging
@@ -22,9 +21,11 @@ from pokemongo_bot.item_list import Item
 from pokemongo_bot.stepper import Stepper
 from pokemongo_bot.plugins import PluginManager
 from api import PoGoApi
-from api.pokemon import Pokemon
-from api.worldmap import Cell
 from geopy.geocoders import GoogleV3  # type: ignore
+# Uncomment for type annotations on Python 3
+# from typing import Any, List, Dict, Union, Tuple
+# from api.pokemon import Pokemon
+# from api.worldmap import Cell
 
 
 class PokemonGoBot(object):
@@ -38,7 +39,6 @@ class PokemonGoBot(object):
         self.log = None
         self.stepper = None
         self.api_wrapper = None
-        self.inventory = []
         self.ignores = []
         self.position = (0, 0, 0)
         self.plugin_manager = None
@@ -161,7 +161,7 @@ class PokemonGoBot(object):
                 # Sort all by distance from current pos- eventually this should
                 # build graph & A* it
                 catchable_pokemon.sort(
-                        key=lambda x: distance(self.position[0], self.position[1], x['latitude'], x['longitude']))
+                    key=lambda x: distance(self.position[0], self.position[1], x['latitude'], x['longitude']))
                 for pokemon in catchable_pokemon:
                     with open('web/catchable-%s.json' % self.config.username, 'w') as outfile:
                         json.dump(pokemon, outfile)
@@ -177,7 +177,7 @@ class PokemonGoBot(object):
                 # Sort all by distance from current pos- eventually this should
                 # build graph & A* it
                 cell['wild_pokemons'].sort(
-                        key=lambda x: distance(self.position[0], self.position[1], x['latitude'], x['longitude']))
+                    key=lambda x: distance(self.position[0], self.position[1], x['latitude'], x['longitude']))
                 for pokemon in cell['wild_pokemons']:
                     worker = PokemonCatchWorker(pokemon, self)
                     if worker.work() == -1:
@@ -188,8 +188,8 @@ class PokemonGoBot(object):
         # log settings
         # log format
         logging.basicConfig(
-                level=logging.DEBUG,
-                format='%(asctime)s [%(module)10s] [%(levelname)5s] %(message)s')
+            level=logging.DEBUG,
+            format='%(asctime)s [%(module)10s] [%(levelname)5s] %(message)s')
 
         if self.config.debug:
             logging.getLogger("requests").setLevel(logging.DEBUG)
@@ -287,8 +287,7 @@ class PokemonGoBot(object):
 
     def print_player_data(self, player):
         # @@@ TODO: Convert this to d/m/Y H:M:S
-        creation_date = datetime.datetime.fromtimestamp(
-                player['creation_timestamp_ms'] / 1e3)
+        creation_date = datetime.datetime.fromtimestamp(player['creation_timestamp_ms'] / 1e3)
 
         balls_stock = self.pokeball_inventory()
 
@@ -298,13 +297,8 @@ class PokemonGoBot(object):
         logger.log('[#]')
         logger.log('[#] Username: {username}'.format(**player))
         logger.log('[#] Account Creation: {}'.format(creation_date))
-        logger.log('[#] Bag Storage: {}/{}'.format(
-                self.get_inventory_count('item'),
-                player['max_item_storage']))
-        logger.log('[#] Pokemon Storage: {}/{}'.format(
-                self.get_inventory_count('pokemon'),
-                player['max_pokemon_storage']
-        ))
+        logger.log('[#] Bag Storage: {}/{}'.format(self.get_item_count(), player['max_item_storage']))
+        logger.log('[#] Pokemon Storage: {}/{}'.format(self.get_pokemon_count(), player['max_pokemon_storage']))
         logger.log('[#] Stardust: {}'.format(stardust))
         logger.log('[#] Pokecoins: {}'.format(pokecoins))
         logger.log('[#] PokeBalls: {}'.format(balls_stock[1]))
@@ -328,9 +322,7 @@ class PokemonGoBot(object):
     def update_player_and_inventory(self):
         # type: () -> Dict[str, object]
         self.api_wrapper.get_player().get_inventory()
-        response = self.api_wrapper.call()
-        self.inventory = response["inventory"]
-        return response
+        return self.api_wrapper.call()
 
     def pokeball_inventory(self):
         balls_stock = {Item.ITEM_POKE_BALL.value: 0,
@@ -425,16 +417,18 @@ class PokemonGoBot(object):
         self.api_wrapper.get_hatched_eggs()
         self.api_wrapper.get_inventory()
         self.api_wrapper.check_awarded_badges()
-        response = self.api_wrapper.call()
-        self.inventory = response["inventory"]
+        self.api_wrapper.call()
 
-    def get_inventory_count(self, what):
-        # type: (str) -> int
+    def get_pokemon_count(self):
+        # type: () -> int
         response_dict = self.update_player_and_inventory()
         if response_dict is None:
             return 0
-        elif what == 'pokemon':
-            return len(response_dict["pokemon"])
-        elif what == 'item':
-            return len(response_dict["inventory"])
-        return 0
+        return len(response_dict["pokemon"])
+
+    def get_item_count(self):
+        # type: () -> int
+        response_dict = self.update_player_and_inventory()
+        if response_dict is None:
+            return 0
+        return len(response_dict["inventory"])

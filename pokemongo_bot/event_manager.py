@@ -1,3 +1,6 @@
+from __future__ import print_function
+
+
 class Event(object):
     def __init__(self, name):
         self.name = name

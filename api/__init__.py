@@ -1,6 +1,8 @@
+from __future__ import print_function
+import time
+
 from pgoapi import PGoApi                                           # type: ignore
 from pgoapi.exceptions import ServerSideRequestThrottlingException  # type: ignore
-import time
 from .state_manager import StateManager
 
 
@@ -43,6 +45,7 @@ class PoGoApi(object):
         return function
 
     def get_expiration_time(self):
+        # pylint: disable=protected-access
         ticket = self._api._auth_provider.get_ticket()
         if ticket is False or ticket is None:
             return 0
@@ -101,8 +104,8 @@ class PoGoApi(object):
                 time.sleep(5)
             else:
                 # status code 1: success
-                with open('api-test.txt', 'w') as f:
-                    f.write(str(results))
+                with open('api-test.txt', 'w') as outfile:
+                    outfile.write(str(results))
 
                 self.state.mark_stale(uncached_method_keys)
 

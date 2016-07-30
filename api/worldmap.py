@@ -21,22 +21,6 @@ class PokeStop(Fort):
         self.lure_encounter_id = lure_info.get("active_pokemon_id", 0)
         self.fort_type = 1
 
-        """
-               "id":"7ae7f45fb3e643d7a846b2d3f60e27e7.16",
-               "lure_info":{  
-                  "active_pokemon_id":129,
-                  "fort_id":"7ae7f45fb3e643d7a846b2d3f60e27e7.16",
-                  "lure_expires_timestamp_ms":1469759077519,
-                  "encounter_id":2028465687
-               },
-               "last_modified_timestamp_ms":1469758177570,
-               "latitude":40.781831,
-               "active_fort_modifier":"9QM=",
-               "longitude":-73.97412,
-               "enabled":1,
-               "type":1
-        """
-
 
 class Gym(Fort):
     def __init__(self, data):
@@ -48,18 +32,6 @@ class Gym(Fort):
         self.guard_pokemon_id = data.get("guard_pokemon_id", 0)
         self.owned_by_team = data.get("owned_by_team", 0)
         self.gym_points = data.get("gym_points", 0)
-
-        """
-               "last_modified_timestamp_ms":1469759071295,
-               "guard_pokemon_id":6,
-               "latitude":40.781115,
-               "gym_points":2250,
-               "id":"5470838db6d54ed4aa235bd2c0fe744e.16",
-               "owned_by_team":3,
-               "longitude":-73.973744,
-               "enabled":1,
-               "is_in_battle":1
-        """
 
 
 class Cell(object):

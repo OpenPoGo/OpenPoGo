@@ -23,10 +23,8 @@ class SeenFortWorker(object):
         logger.log("Spinning...", "yellow")
         sleep(3)
         self.api_wrapper.fort_search(fort_id=self.fort.fort_id,
-                                     fort_latitude=lat,
-                                     fort_longitude=lng,
-                                     player_latitude=self.position[0],
-                                     player_longitude=self.position[1])
+                                     fort_latitude=lat, fort_longitude=lng,
+                                     player_latitude=self.position[0], player_longitude=self.position[1])
         response_dict = self.api_wrapper.call()
         if response_dict is None:
             return
@@ -36,11 +34,9 @@ class SeenFortWorker(object):
         spin_result = spin_details.get("result")
         if spin_result == 1:
             logger.log("[+] Loot: ", "green")
-            experience_awarded = spin_details.get("experience_awarded",
-                                                  False)
+            experience_awarded = spin_details.get("experience_awarded", False)
             if experience_awarded:
-                logger.log("[+] " + str(experience_awarded) + " xp",
-                           "green")
+                logger.log("[+] " + str(experience_awarded) + " xp", "green")
 
             items_awarded = spin_details.get("items_awarded", False)
             if items_awarded:
@@ -56,8 +52,7 @@ class SeenFortWorker(object):
                     item_id = str(item_id)
                     item_name = self.item_list[item_id]
 
-                    logger.log("[+] " + str(item_count) + "x " + item_name,
-                               "green")
+                    logger.log("[+] " + str(item_count) + "x " + item_name, "green")
                 if self.config.recycle_items:
                     recycle_worker = RecycleItemsWorker(self.bot)
                     recycle_worker.work()
@@ -65,13 +60,11 @@ class SeenFortWorker(object):
             else:
                 logger.log("[#] Nothing found.", "yellow")
 
-            pokestop_cooldown = spin_details.get(
-                    "cooldown_complete_timestamp_ms")
+            pokestop_cooldown = spin_details.get("cooldown_complete_timestamp_ms")
             if pokestop_cooldown:
                 seconds_since_epoch = time.time()
-                logger.log("[#] PokeStop on cooldown. Time left: " + str(
-                        format_time((pokestop_cooldown / 1000) -
-                                    seconds_since_epoch)))
+                cooldown_time = str(format_time((pokestop_cooldown / 1000) - seconds_since_epoch))
+                logger.log("[#] PokeStop on cooldown. Time left: " + cooldown_time)
 
             if not items_awarded and not experience_awarded and not pokestop_cooldown:
                 message = (
@@ -85,13 +78,11 @@ class SeenFortWorker(object):
         elif spin_result == 2:
             logger.log("[#] Pokestop out of range")
         elif spin_result == 3:
-            pokestop_cooldown = spin_details.get(
-                    "cooldown_complete_timestamp_ms")
+            pokestop_cooldown = spin_details.get("cooldown_complete_timestamp_ms")
             if pokestop_cooldown:
                 seconds_since_epoch = time.time()
-                logger.log("[#] PokeStop on cooldown. Time left: " + str(
-                        format_time((pokestop_cooldown / 1000) -
-                                    seconds_since_epoch)))
+                cooldown_time = str(format_time((pokestop_cooldown / 1000) - seconds_since_epoch))
+                logger.log("[#] PokeStop on cooldown. Time left: " + cooldown_time)
         elif spin_result == 4:
             logger.log("[#] Inventory is full, switching to catch mode...", "red")
             self.config.mode = "poke"

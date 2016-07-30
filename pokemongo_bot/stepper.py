@@ -2,18 +2,19 @@
 
 from datetime import datetime
 from math import ceil
-from typing import Optional, List
 import json
 import googlemaps
 
-from s2sphere import CellId, LatLng # type: ignore
+from s2sphere import CellId, LatLng  # type: ignore
 from pokemongo_bot.human_behaviour import sleep, random_lat_long_delta
 from pokemongo_bot.utils import distance, format_time, f2i
 import pokemongo_bot.logger as logger
 
+# Uncomment to enable type annotations for Python 3
+# from typing import Optional, List
+
 
 class Stepper(object):
-
     AVERAGE_STRIDE_LENGTH_IN_METRES = 0.60
 
     def __init__(self, bot):
@@ -57,15 +58,8 @@ class Stepper(object):
             if len(directions_result) and len(directions_result[0]["legs"]):
                 for leg in directions_result[0]["legs"]:
                     for step in leg["steps"]:
-                        self._do_walk_to(
-                            speed,
-                            step["start_location"]["lat"],
-                            step["start_location"]["lng"],
-                            step["end_location"]["lat"],
-                            step["end_location"]["lng"],
-                            alt,
-                            10
-                        )
+                        self._do_walk_to(speed, step["start_location"]["lat"], step["start_location"]["lng"],
+                                         step["end_location"]["lat"], step["end_location"]["lng"], alt, 10)
             else:
                 # If google doesn't know the way, then we just have to go as the crow flies
                 self._do_walk_to(speed, position_lat, position_lng, lat, lng, alt, 25)
@@ -81,7 +75,8 @@ class Stepper(object):
         dist = distance(from_lat, from_lng, to_lat, to_lng)
         steps = (dist / (self.AVERAGE_STRIDE_LENGTH_IN_METRES * speed))
 
-        logger.log("[#] Walking from " + str((from_lat, from_lng)) + " to " + str(str((to_lat, to_lng))) + " for approx. " + str(format_time(ceil(steps))))
+        logger.log("[#] Walking from " + str((from_lat, from_lng)) + " to " + str(
+            str((to_lat, to_lng))) + " for approx. " + str(format_time(ceil(steps))))
         if steps != 0:
             d_lat = (to_lat - from_lat) / steps
             d_long = (to_lng - from_lng) / steps
@@ -121,25 +116,22 @@ class Stepper(object):
         cell_id = self._get_cell_id_from_latlong()
         timestamp = [0, ] * len(cell_id)
         self.api_wrapper.get_map_objects(latitude=f2i(lat),
-                                 longitude=f2i(lng),
-                                 since_timestamp_ms=timestamp,
-                                 cell_id=cell_id)
+                                         longitude=f2i(lng),
+                                         since_timestamp_ms=timestamp,
+                                         cell_id=cell_id)
 
         response_dict = self.api_wrapper.call()
         if response_dict is None:
             return
         # Passing data through last-location and location
         map_objects = response_dict["worldmap"]
-        """
-        with open("web/location-{}.json".format(self.config.username), "w") as outfile:
-            json.dump({"lat": lat, "lng": lng, "cells": convert_to_utf8(map_objects.get("map_cells"))}, outfile)
-        """
         with open("data/last-location-{}.json".format(self.config.username), "w") as outfile:
             outfile.truncate()
             json.dump({"lat": lat, "lng": lng}, outfile)
 
         map_cells = map_objects.cells
         # Sort all by distance from current pos - eventually this should build graph and A* it
-        map_cells.sort(key=lambda x: distance(lat, lng, x.pokestops[0].latitude, x.pokestops[0].longitude) if len(x.pokestops) > 0 else 1e6)
+        map_cells.sort(key=lambda x: distance(lat, lng, x.pokestops[0].latitude, x.pokestops[0].longitude) if len(
+            x.pokestops) > 0 else 1e6)
         for cell in map_cells:
             self.bot.work_on_cell(cell, pokemon_only)

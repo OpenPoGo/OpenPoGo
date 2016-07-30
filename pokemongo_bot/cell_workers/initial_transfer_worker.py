@@ -49,12 +49,7 @@ class InitialTransferWorker(object):
         pokemon_groups = {}
         self.api_wrapper.get_player().get_inventory()
         response_dict = self.api_wrapper.call()
-        inventory, pokemon_list = response_dict['inventory'], response_dict['pokemon']
-        """
-        inventory_dict = inventory_req['responses']['GET_INVENTORY']['inventory_delta']['inventory_items']
-        with open('web/inventory-%s.json' % (self.config.username), 'w') as outfile:
-            json.dump(inventory_dict, outfile)
-        """
+        pokemon_list = response_dict['pokemon']
 
         for pokemon in pokemon_list:
             group_id = pokemon.pokemon_id

@@ -1,3 +1,6 @@
+# pylint: disable=unused-argument
+from __future__ import print_function
+
 from .player import Player
 from .inventory import Inventory
 from .worldmap import WorldMap, Gym, PokeStop
@@ -157,8 +160,7 @@ class StateManager(object):
         self._update_state(new_state)
 
     def _parse_map(self, key, response):
-        # TODO: Figure out how I want to do WorldMap. Lazy loading might
-        # be a better idea
+        # TODO: Figure out how I want to do WorldMap. Lazy loading might be a better idea
         """
         current_map = self.current_state.get("worldmap", None)
         if current_map is None:

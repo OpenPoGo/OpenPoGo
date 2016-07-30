@@ -30,7 +30,6 @@ class PokemonCatchWorker(object):
         self.config = bot.config
         self.pokemon_list = bot.pokemon_list
         self.item_list = bot.item_list
-        self.inventory = bot.inventory
 
     def should_transfer(self, combat_power, pokemon_potential):
         # type: (int, float) -> bool
@@ -39,47 +38,37 @@ class PokemonCatchWorker(object):
     def throw_pokeball(self, encounter_id, pokeball, spawn_point_id, combat_power, pokemon_potential, pokemon_name):
         # type: (int, int, str, int, float, str) -> bool
         id_list_before_catching = self.get_pokemon_ids()
-        self.api_wrapper.catch_pokemon(
-                encounter_id=encounter_id,
-                pokeball=pokeball,
-                normalized_reticle_size=1.950 - random.random() / 200,
-                spawn_point_id=spawn_point_id,
-                hit_pokemon=True,
-                spin_modifier=1,
-                normalized_hit_position=1)
+        self.api_wrapper.catch_pokemon(encounter_id=encounter_id,
+                                       pokeball=pokeball,
+                                       normalized_reticle_size=1.950 - random.random() / 200,
+                                       spawn_point_id=spawn_point_id,
+                                       hit_pokemon=True,
+                                       spin_modifier=1,
+                                       normalized_hit_position=1)
         response = self.api_wrapper.call()
         if response is None:
             return False
         pokemon_catch_response = response["encounter"]
         status = pokemon_catch_response.status
         if status is 2:
-            logger.log(
-                    '[-] Attempted to capture {} - failed.. trying again!'.format(
-                            pokemon_name), 'red')
+            logger.log('[-] Attempted to capture {} - failed.. trying again!'.format(pokemon_name), 'red')
             sleep(2)
             return True
         elif status is 3:
-            logger.log(
-                    '[x] Oh no! {} vanished! :('.format(
-                            pokemon_name), 'red')
+            logger.log('[x] Oh no! {} vanished! :('.format(pokemon_name), 'red')
             return False
         elif status is 1:
+            self.bot.fire('pokemon_caught',
+                          name=pokemon_name,
+                          combat_power=combat_power,
+                          pokemon_potential=pokemon_potential)
             if self.should_transfer(combat_power, pokemon_potential):
-                self.bot.fire('after_catch_pokemon',
-                              name=pokemon_name,
-                              combat_power=combat_power,
-                              pokemon_potential=pokemon_potential)
                 id_list_after_catching = self.get_pokemon_ids()
 
                 # Transferring Pokemon
                 pokemon_to_transfer = list(set(id_list_after_catching) - set(id_list_before_catching))
                 self.transfer_pokemon(pokemon_to_transfer[0])
-                logger.log(
-                        '[#] {} has been exchanged for candy!'.format(pokemon_name), 'green')
-            else:
-                # TODO: Should move this to the proper location
-                self.bot.fire('after_catch_pokemon', name=pokemon_name, combat_power=combat_power,
-                              pokemon_potential=pokemon_potential)
+                logger.log('[#] {} has been exchanged for candy!'.format(pokemon_name), 'green')
             return False
         else:
             return False
@@ -149,7 +138,8 @@ class PokemonCatchWorker(object):
                     self.config.mode = 'farm'
                     return self.NO_POKEBALLS
 
-                self.bot.fire('use_pokeball', pokeball_name=self.item_list[str(pokeball)],
+                self.bot.fire('use_pokeball',
+                              pokeball_name=self.item_list[str(pokeball)],
                               number_left=balls_stock[pokeball] - 1)
 
                 balls_stock[pokeball] -= 1
@@ -160,25 +150,12 @@ class PokemonCatchWorker(object):
     def _transfer_low_cp_pokemon(self, value):
         self.api_wrapper.get_inventory()
         response_dict = self.api_wrapper.call()
-        self._transfer_all_low_cp_pokemon(value, response_dict)
-
-    def _transfer_all_low_cp_pokemon(self, value, response_dict):
         if response_dict is not None:
             pokemon_list = response_dict["pokemon"]
             for pokemon in pokemon_list:
                 if pokemon.combat_power < value:
                     self.transfer_pokemon(pokemon.unique_id)
                 time.sleep(1.2)
-            """
-            inventory_items = response_dict.get("responses", {}).get("GET_INVENTORY", {}).get("inventory_delta", {}).get("inventory_items")
-            for item_data in inventory_items:
-                item = item_data.get("inventory_item_data", {}).get("pokemon")
-                if item is not None:
-                    pokemon = item['inventory_item_data']['pokemon']
-                    if 'cp' in pokemon and pokemon['cp'] < value:
-                        self.transfer_pokemon(pokemon["id"])
-                    time.sleep(1.2)
-            """
 
     def transfer_pokemon(self, pid):
         self.api_wrapper.release_pokemon(pokemon_id=pid).call()

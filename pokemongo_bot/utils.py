@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-from typing import List
 # pylint: disable=redefined-builtin
 from builtins import bytes, str
 import struct
 import time
 
-from api.worldmap import Fort, PokeStop
+from api.worldmap import PokeStop
 from colorama import init               # type: ignore
 from geopy.distance import vincenty     # type: ignore
+
+# Uncomment to enable type annotations for Python 3
+# from typing import List
+# from api.worldmap import Fort
 
 init()
 
