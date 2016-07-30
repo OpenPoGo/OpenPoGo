@@ -29,6 +29,7 @@ See [CONTRIBUTING.md](https://github.com/OpenPoGo/OpenPoGoBot/blob/master/CONTRI
  * Filter certain pokemon
  * Use superior ball types when necessary
  * When out of normal pokeballs, use the next type of ball unless there are less than 10 of that type, in which case start automatically farming pokestops
+ * Bot Navigation via Google Directions API
 
 
 ## Installation
@@ -79,6 +80,7 @@ pip install -r requirements.txt
       -ri, --recycle-items                          Recycle unneeded items automatically
       -ep LIST, --exclude-plugins LIST              Pass a list of plugins to exclude from the loading process (e.g, logger,web).
       -k KEY, --gmapkey KEY                         Set a google maps API key to use
+      -gd, --google-directions                      Bot will use directions from google maps API to navigate
       -d, --debug                                   Debug Mode
       -t, --test                                    Only parse the specified location
 
