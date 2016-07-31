@@ -45,8 +45,7 @@ def pokemon_found(bot, encounters=None):
                 return
 
             combat_power = pokemon.combat_power
-            total_iv = pokemon.attack + pokemon.defense + pokemon.stamina
-            pokemon_potential = round((total_iv / 45.0), 2)
+            pokemon_potential = pokemon.potential
             pokemon_num = pokemon.pokemon_id - 1
             pokemon_name = bot.pokemon_list[pokemon_num]["Name"]
 
