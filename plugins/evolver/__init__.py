@@ -3,6 +3,7 @@ from pokemongo_bot import manager
 from pokemongo_bot import sleep
 
 # pylint: disable=unused-argument
+# pylint: disable=too-many-nested-blocks
 
 @manager.on('after_catch_pokemon')
 def _after_catch(event, name=None, bot=None, combat_power=None, pokemon_potential=None):
