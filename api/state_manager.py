@@ -15,6 +15,7 @@ class StateManager(object):
         self.response_map = {
             "GET_PLAYER": self._parse_player,
             "GET_INVENTORY": self._parse_inventory,
+            "RECYCLE_INVENTORY_ITEM": self._noop,
             "GET_MAP_OBJECTS": self._parse_map,
             "ENCOUNTER": self._parse_encounter,
             "RELEASE_POKEMON": self._noop,
@@ -29,6 +30,7 @@ class StateManager(object):
         self.method_returns_states = {
             "GET_PLAYER": ["player"],
             "GET_INVENTORY": ["player", "inventory", "pokemon", "pokedex", "candy", "eggs"],
+            "RECYCLE_INVENTORY_ITEM" : ["inventory"],
             "CHECK_AWARDED_BADGES": [],
             "DOWNLOAD_SETTINGS": [],
             "GET_HATCHED_EGGS": [],
@@ -48,6 +50,7 @@ class StateManager(object):
         self.method_mutates_states = {
             "GET_PLAYER": [],
             "GET_INVENTORY": [],
+            "RECYCLE_INVENTORY_ITEM": ["inventory"],
             "CHECK_AWARDED_BADGES": [],
             "DOWNLOAD_SETTINGS": [],
             "GET_HATCHED_EGGS": [],
