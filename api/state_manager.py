@@ -1,6 +1,7 @@
 # pylint: disable=unused-argument
 from __future__ import print_function
 
+from pokemongo_bot import logger
 from .player import Player
 from .inventory import Inventory
 from .worldmap import WorldMap, Gym, PokeStop
@@ -33,7 +34,7 @@ class StateManager(object):
             "GET_PLAYER": ["player"],
             "GET_INVENTORY": ["player", "inventory", "pokemon", "pokedex", "candy", "eggs"],
             "USE_ITEM_EGG_INCUBATOR":["egg_incubators"],
-            "GET_HATCHED_EGGS":["egg_incubators"],
+            "GET_HATCHED_EGGS":["player"],
             "CHECK_AWARDED_BADGES": [],
             "DOWNLOAD_SETTINGS": [],
             "GET_MAP_OBJECTS": ["worldmap"],
@@ -53,7 +54,7 @@ class StateManager(object):
             "GET_PLAYER": [],
             "GET_INVENTORY": [],
             "USE_ITEM_EGG_INCUBATOR":["egg_incubators"],
-            "GET_HATCHED_EGGS":["egg_incubators"],
+            "GET_HATCHED_EGGS":["player"],
             "CHECK_AWARDED_BADGES": [],
             "DOWNLOAD_SETTINGS": [],
             "GET_MAP_OBJECTS": ["worldmap"],
@@ -201,9 +202,14 @@ class StateManager(object):
 
 
     def _parse_get_hatched_eggs(self, key, response):
-        #{'stardust_awarded': [1235], 'candy_awarded': [16], 'experience_awarded': [500], 'success': True, 'pokemon_id': [8895755261831035305L]}
         if response.get("success", False):
-            print("[+] Hatched an egg!", "green")
+            current_player = self.current_state.get("player", None)
+            if current_player is None:
+                current_player = Player()
+
+            current_player.update_hatched_eggs(response)
+            self._update_state({"player": current_player})
+            logger.log("[+] Hatched an egg!", "green")
 
     def _parse_use_incubator(self, key, response):
         if response["result"] == 1:

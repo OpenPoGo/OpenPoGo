@@ -23,7 +23,8 @@ class WalkTowardsFortWorker(object):
             response_dict = self.api_wrapper.call()
 
             eggs = [egg.unique_id for egg in response_dict["eggs"] if egg.egg_incubator_id == ""]
-            incubators = [incu.unique_id for incu in response_dict["egg_incubators"] if incu.pokemon_id == 0]
+            incubators = [incu.unique_id for incu in response_dict["egg_incubators"] if incu.pokemon_id == 0 and (
+                self.config.use_all_incubators or incu.item_id == 901)]
 
             for incubator_unique_id in incubators:
                 if len(eggs) > 0:
