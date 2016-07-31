@@ -6,7 +6,7 @@ def log(text, color="black"):
     manager.fire("logging", text=text, color=color, prefix="Transfer")
 
 
-@manager.on("pokemon_bag_full", priority=1000)
+@manager.on("pokemon_bag_full", priority=-1000)
 def filter_pokemon(bot=None, transfer_list=None):
     # type: (PokemonGoBot, Optional[List[Pokemon]]) -> Dict[Str, List[Pokemon]]
 
@@ -60,7 +60,7 @@ def filter_pokemon(bot=None, transfer_list=None):
     return {"transfer_list": new_transfer_list}
 
 
-@manager.on("pokemon_bag_full", "transfer_pokemon", priority=0)
+@manager.on("pokemon_bag_full", "transfer_pokemon", priority=1000)
 def transfer_pokemon(bot=None, transfer_list=None):
     # type: (PokemonGoBot, Optional[List[Pokemon]]) -> None
 

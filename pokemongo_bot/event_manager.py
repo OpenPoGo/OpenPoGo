@@ -1,5 +1,24 @@
 from __future__ import print_function
 import inspect
+import time
+
+from colorama import Fore, Style
+
+
+def log(text, color=None):
+    # type: (str, Optional[str]) -> None
+
+    # Added because this code needs to run without importing the logger module.
+    color_hex = {
+        'green': Fore.GREEN,
+        'yellow': Fore.YELLOW,
+        'red': Fore.RED
+    }
+    string = str(text)
+    output = u"[" + time.strftime("%Y-%m-%d %H:%M:%S") + u"] [Event Manager] {}".format(string)
+    if color in color_hex:
+        output = color_hex[color] + output + Style.RESET_ALL
+    print(output)
 
 
 class Event(object):
@@ -7,7 +26,7 @@ class Event(object):
         self.name = name
         self.listeners = {}
         self.num_listeners = 0
-        print("[Event Manager] Initialized new event \"{}\"".format(self.name))
+        log("Initialized new event \"{}\"".format(self.name), color="green")
 
     def add_listener(self, listener, priority=0):
         self.num_listeners += 1
@@ -22,10 +41,10 @@ class Event(object):
 
     def fire(self, **kwargs):
         if self.num_listeners == 0:
-            print("[Event Manager] WARNING: No handler has registered to handle event \"{}\"".format(self.name))
+            log("WARNING: No handler has registered to handle event \"{}\"".format(self.name), color="yellow")
 
         # Sort events by priorities from greatest to least
-        priorities = sorted(self.listeners, key=lambda event_priority: event_priority * -1)
+        priorities = sorted(self.listeners, key=lambda event_priority: event_priority)
         for priority in priorities:
             for listener in self.listeners[priority]:
 
