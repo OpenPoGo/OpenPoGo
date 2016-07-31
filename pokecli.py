@@ -34,13 +34,15 @@ import argparse
 import ssl
 import logging
 import sys
+
 from pokemongo_bot import logger
 from pokemongo_bot import PokemonGoBot
+import colorama
 
 # Disable HTTPS certificate verification
 if sys.version_info >= (2, 7, 9):
     # pylint: disable=protected-access
-    ssl._create_default_https_context = ssl._create_unverified_context
+    ssl._create_default_https_context = ssl._create_unverified_context  # type: ignore
 
 
 def init_config():
@@ -54,6 +56,15 @@ def init_config():
         "ign_init_trans": "",
         "exclude_plugins": "",
         "recycle_items": False,
+        "item_filter": {
+            1: 100,
+            101: 0,
+            102: 0,
+            103: 10,
+            104: 10,
+            201: 10,
+            202: 10
+        },
         "location_cache": False,
         "initial_transfer": False,
         "evolve_pokemon": False,
@@ -95,7 +106,7 @@ def init_config():
     parser.add_argument(
         "-w",
         "--walk",
-        help=" Walk instead of teleport with given speed (meters per second max 4.16 because of walking end on 15km/h)",
+        help="Walk instead of teleport with given speed (meters per second max 4.16 because of walking end on 15km/h)",
         type=float,
         dest="walk")
     parser.add_argument(
@@ -200,15 +211,12 @@ def init_config():
         for key in loaded_config:
             if config.__dict__.get(key) is None:
                 config.__dict__[key] = loaded_config.get(key)
-        for key in config.__dict__:
-            if config.__dict__.get(key) is None and loaded_config.get(key) is not None:
-                config.__dict__[key] = loaded_config.get(key)
 
-    for key in config.__dict__:
+    for key in default_config:
         if config.__dict__.get(key) is None and default_config.get(key) is not None:
             config.__dict__[key] = default_config.get(key)
 
-    config.exclude_plugins = [plugin_name for plugin_name in config.exclude_plugins.split(",")]
+    config.exclude_plugins = config.exclude_plugins.split(",")
 
     print(config.__dict__)
 
@@ -232,6 +240,8 @@ def main():
     # log settings
     # log format
     # logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(module)10s] [%(levelname)5s] %(message)s')
+
+    colorama.init()
 
     config = init_config()
     if not config:
