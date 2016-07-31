@@ -156,6 +156,7 @@ class PokemonGoBot(object):
         if response_dict is not None:
             player = response_dict['player']
             inventory = response_dict['inventory']
+            self.update_candies(response_dict['candy'])
             pokemon = response_dict['pokemon']
             creation_date = player.get_creation_date()
 
@@ -230,14 +231,9 @@ class PokemonGoBot(object):
         self.api_wrapper.get_player().get_inventory()
         return self.api_wrapper.call()
 
-    def update_candies(self, inventory_items):
-        if inventory_items is None:
-            return
-        for item in inventory_items:
-            pokemon_candies = item.get('inventory_item_data', {}).get('pokemon_family')
-            if pokemon_candies is None or 'family_id' not in pokemon_candies or 'candy' not in pokemon_candies:
-                continue
-            self.candies[pokemon_candies['family_id']] = pokemon_candies['candy']
+    def update_candies(self, candies):
+        for key in candies:
+            self.candies[key] = candies[key]
         self._candies_use_name()
 
     def add_candies(self, name=None, pokemon_candies=None):
