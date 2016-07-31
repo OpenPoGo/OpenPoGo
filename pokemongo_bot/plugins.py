@@ -1,12 +1,9 @@
 import collections
 import imp
 import os
-import logging
 import time
 
 from colorama import Fore, Style
-
-logging.basicConfig(level=logging.DEBUG)
 
 __author__ = "Michael E. Cotterell"
 __email__ = "mepcotterell@gmail.com"
@@ -35,8 +32,7 @@ class PluginManager(object):
     A simple plugin manager
     """
 
-    def __init__(self, plugin_folder, main_module='__init__', log=logging):
-        self.logging = log
+    def __init__(self, plugin_folder, main_module='__init__'):
         self.plugin_folder = plugin_folder
         self.main_module = main_module
         self.loaded_plugins = collections.OrderedDict()

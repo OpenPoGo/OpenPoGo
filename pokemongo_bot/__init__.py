@@ -45,7 +45,7 @@ class PokemonGoBot(object):
 
     def _init_plugins(self):
         # create a plugin manager
-        self.plugin_manager = PluginManager('./plugins', log=logger)
+        self.plugin_manager = PluginManager('./plugins')
 
         # load all plugin modules
         for plugin in self.plugin_manager.get_available_plugins():
