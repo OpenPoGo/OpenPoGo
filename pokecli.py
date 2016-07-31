@@ -57,6 +57,7 @@ def init_config():
         "location_cache": False,
         "initial_transfer": False,
         "evolve_pokemon": False,
+        "evolve_filter":[],
         "debug": False,
         "test": False
     }
