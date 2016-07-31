@@ -23,6 +23,7 @@ class StateManager(object):
             "PLAYER_UPDATE": self._noop,
             "FORT_DETAILS": self._parse_fort,
             "FORT_SEARCH": self._identity,
+            "RECYCLE_INVENTORY_ITEM": self._noop
         }
 
         # Maps methods to the state objects that they refresh.
@@ -39,7 +40,8 @@ class StateManager(object):
             "RELEASE_POKEMON": [],
             "PLAYER_UPDATE": [],
             "FORT_DETAILS": ["fort"],
-            "FORT_SEARCH": []
+            "FORT_SEARCH": [],
+            "RECYCLE_INVENTORY_ITEM": []
         }
 
         # Maps methods to the state objects that they invalidate.
@@ -60,7 +62,8 @@ class StateManager(object):
             "CATCH_POKEMON": ["encounter", "player", "pokemon", "pokedex", "candy", "inventory"],
             "PLAYER_UPDATE": ["player", "inventory"],
             "FORT_DETAILS": ["fort"],
-            "FORT_SEARCH": ["player", "inventory", "eggs"]
+            "FORT_SEARCH": ["player", "inventory", "eggs"],
+            "RECYCLE_INVENTORY_ITEM": ["inventory"]
         }
 
         self.current_state = {}
@@ -176,9 +179,7 @@ class StateManager(object):
         self._update_state({"worldmap": current_map})
 
     def _parse_encounter(self, key, response):
-        current_encounter = self.current_state.get("encounter", None)
-        if current_encounter is None:
-            current_encounter = Encounter()
+        current_encounter = Encounter()
         current_encounter.update_encounter(response)
         self._update_state({"encounter": current_encounter})
 
