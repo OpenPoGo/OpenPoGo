@@ -2,6 +2,7 @@
 from __future__ import print_function
 from builtins import str
 import time
+import platform
 
 from colorama import Fore, Back, Style
 from pokemongo_bot.event_manager import manager
@@ -43,6 +44,9 @@ def _log(text="", color="black", prefix=None):
     output += string
     if color in color_hex:
         output = color_hex[color] + output + Style.RESET_ALL
-    print(unicode(output))
+    if platform.system() == "Windows" || platform.system() == "FreeBSD":
+        print(output.encode('cp437', errors='replace').decode('cp437'))
+    else:
+        print(output)
     if LCD is not None and string is not None:
         LCD.message(string)
