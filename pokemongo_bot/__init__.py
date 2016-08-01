@@ -98,6 +98,7 @@ class PokemonGoBot(object):
         for cell in map_cells:
             self.fire("pokemon_found", encounters=cell.catchable_pokemon + cell.wild_pokemon)
             self.fire("pokestops_found", pokestops=cell.pokestops)
+            self.fire("gyms_found", gyms=cell.gyms)
 
     def _setup_logging(self):
         self.log = logging.getLogger(__name__)
@@ -322,3 +323,10 @@ class PokemonGoBot(object):
         if response_dict is None:
             return 0
         return response_dict["inventory"]["count"]
+
+    def get_username(self):
+        # type: () -> str
+        response_dict = self.update_player_and_inventory()
+        if response_dict is None:
+            return "Unknown"
+        return response_dict["player"].username
