@@ -57,18 +57,36 @@ def init_config():
         "exclude_plugins": "",
         "recycle_items": False,
         "item_filter": {
-            1: 100,
-            101: 0,
-            102: 0,
-            103: 10,
-            104: 10,
-            201: 10,
-            202: 10
+            1: {
+                "keep": 100
+            },
+            101: {
+                "keep": 0
+            },
+            102: {
+                "keep": 0
+            },
+            103: {
+                "keep": 10
+            },
+            104: {
+                "keep": 10
+            },
+            201: {
+                "keep": 10
+            },
+            202: {
+                "keep": 10
+            }
         },
         "location_cache": False,
         "initial_transfer": False,
         "evolve_pokemon": False,
         "evolve_filter":[],
+        "navigator": "fort",
+        "navigator_waypoints": [],
+        "navigator_campsite": None,
+        "path_finder": "google",
         "debug": False,
         "test": False
     }
@@ -98,17 +116,36 @@ def init_config():
         dest="location_cache",
         default=None)
     parser.add_argument(
-        "-m",
-        "--mode",
-        help="Set farming Mode for the bot ('all', 'poke', 'farm')",
-        type=str,
-        dest="mode")
-    parser.add_argument(
         "-w",
         "--walk",
         help="Walk instead of teleport with given speed (meters per second max 4.16 because of walking end on 15km/h)",
         type=float,
         dest="walk")
+    parser.add_argument(
+        "-n",
+        "--navigator",
+        help="Navigator to use to create a destination. <fort|waypoint|campsite> (default fort)",
+        type=str,
+        dest="navigator")
+    parser.add_argument(
+        "-pf",
+        "--path-finder",
+        help="Path Finder to use to find a path to a point. <google|direct> (default google)",
+        type=str,
+        dest="walk")
+    parser.add_argument(
+        "-wp",
+        "--waypoint",
+        help="Waypoint to visit in coordinates. Only valid if navigator is waypoint",
+        type=str,
+        dest="walk",
+        nargs='*')
+    parser.add_argument(
+        "-camp",
+        "--campsite",
+        help="Waypoint to visit in coordinates. Only valid if navigator is campsite",
+        type=str,
+        dest="navigator_campsite")
     parser.add_argument(
         "-du",
         "--distance-unit",
@@ -234,6 +271,12 @@ def init_config():
 
     config.exclude_plugins = config.exclude_plugins.split(",")
 
+    str_item_filter = config.__dict__.get("item_filter", {})
+    int_item_filter = {}
+    for item_id in str_item_filter:
+        int_item_filter[int(item_id)] = str_item_filter[item_id]
+    config.item_filter = int_item_filter
+
     print(config.__dict__)
 
     if config.auth_service not in ['ptc', 'google']:
@@ -273,7 +316,7 @@ def main():
         logger.log('[x] Starting PokemonGo Bot....', 'green')
 
         while True:
-            bot.take_step()
+            bot.run()
 
     except KeyboardInterrupt:
         logger.log('[x] Exiting PokemonGo Bot', 'red')

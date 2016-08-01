@@ -9,7 +9,6 @@
     "use_all_incubators":false,
     "cp": 100,
     "max_steps": 50,
-    "mode": "all",
     "walk": 4.16,
     "initial_transfer": false,
     "recycle_items": false,
@@ -30,5 +29,9 @@
         "103": { "keep": 30 },
         "201": { "keep": 30 },
         "701": { "keep": 100 }
-    }
+    },
+    "path_finder": "google",
+    "navigator": "fort",
+    "navigator_waypoints": [],
+    "navigator_campsite": null
 }
