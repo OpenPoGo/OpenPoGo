@@ -19,7 +19,9 @@ def filter_recyclable_items(bot, recyclable_items=None):
     for item_type in recyclable_items:
         if item_type not in bot.config.item_filter:
             continue
-        max_keep_quantity = bot.config.item_filter[item_type]
+        max_keep_quantity = bot.config.item_filter[item_type].get("keep", None)
+        if max_keep_quantity is None:
+            continue
         current_quantity = recyclable_items[item_type]
         discard_quantity = current_quantity - max_keep_quantity
         if discard_quantity > 0:
