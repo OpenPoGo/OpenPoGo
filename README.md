@@ -59,33 +59,144 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-    usage: pokecli.py [-h] -a AUTH_SERVICE -u USERNAME -p PASSWORD -l LOCATION [-lc] [-c] [-m] [-w] [--distance_unit] [--initial-transfer] [--maxsteps] [-cp] [-iv] [-d] [-t]
 
-    optional arguments:
-      -h, --help                                    Show this help message and exit
-      -j, --config-json                             Load a config JSON file. Any arguments specified on command line override those specified in the file.
-      -a AUTH_SERVICE, --auth-service AUTH_SERVICE  Auth Service ('ptc' or 'google')
-      -u USERNAME, --username USERNAME              Username
-      -p PASSWORD, --password PASSWORD              Password
-      -l LOCATION, --location LOCATION              Location (Address or 'xx.yyyy,zz.ttttt')
-      -lc, --location-cache                         Bot will start at last known location
-      -m MODE, --mode MODE                          Set farming Mode for the bot ('all', 'poke', 'farm')
-      -w SPEED,  --walk SPEED                       Walk instead of teleport with given speed (meters per second max 4.16 because of walking end on 15km/h)
-      -du UNIT, --distance-unit UNIT                Set the unit to display distance in (e.g, km for kilometers, mi for miles, ft for feet)
-      -it, --initial-transfer                       Start the bot with a pokemon clean up, keeping only the higher CP of each pokemon. It respects -c as upper limit to release.
-      -ig LIST, --ign-init-trans LIST               Pass a list of pokemon to ignore during initial transfer (e.g. 017,049,001)
-      -ms MAX_STEP, --max-steps MAX_STEP            Set the steps around your initial location (DEFAULT 5 mean 25 cells around your location)
-      -cp COMBAT_POWER, --combat-power COMBAT_POWER Transfer Pokemon that have CP less than this value (default 100)",
-      -iv IV, --pokemon-potential IV                Set the ratio for the IV values to transfer (DEFAULT 0.4 eg. 0.4 will transfer a pokemon with IV 0.3)
-      -ri, --recycle-items                          Recycle unneeded items automatically
-      -if LIST, --item-filter LIST                  Pass a list of unwanted items to recycle when collected at a Pokestop (e.g, [\"101\",\"102\",\"103\",\"104\"] to recycle potions when collected). Requires --recycle-items. 
-      -ep LIST, --exclude-plugins LIST              Pass a list of plugins to exclude from the loading process (e.g, logger,web).
-      -k KEY, --gmapkey KEY                         Set a google maps API key to use
-      -gd, --google-directions                      Bot will use directions from google maps API to navigate
-      -d, --debug                                   Debug Mode
-      -t, --test                                    Only parse the specified location
-      -fi, --fill-incubators                        Fill incubators with eggs
-      -ai, --use-all-incubators                     Use all incubators or only unlimited one
+```
+$ pyhton pokecli.py [flags]
+```
+
+####  Flags
+
+<table>
+	<thead>
+		<tr>
+			<th width="25%">Flag</th>
+			<th width="15%">Short Flag</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>--help</td>
+			<td>-h</td>
+			<td>Show this help message and exit</td>
+			</tr>
+		<tr>
+			<td>--config-json</td>
+			<td>-j</td>
+			<td>Load a config JSON file. Any arguments specified on command line override those specified in the file.</td>
+		</tr>
+		<tr>
+			<td>--auth-service [AUTH_SERVICE]</td>
+			<td>-a [AUTH_SERVICE]</td>
+			<td>Auth Service ('ptc' or 'google')</td>
+		</tr>
+		<tr>
+			<td>--username [USERNAME]</td>
+			<td>-u [USERNAME]</td>
+			<td>Username</td>
+		</tr>
+		<tr>
+			<td>--password [PASSWORD]</td>
+			<td>-p [PASSWORD]</td>
+			<td>Password</td>
+		</tr>
+		<tr>
+			<td>--location [LOCATION]</td>
+			<td>-l [LOCATION]</td>
+			<td>Location (Address or 'xx.yyyy,zz.ttttt')</td>
+		</tr>
+		<tr>
+			<td>--location-cache</td>
+			<td>-lc</td>
+			<td>Bot will start at last known location</td>
+		</tr>
+		<tr>
+			<td>--mode [MODE]</td>
+			<td>-m [MODE]</td>
+			<td>Set farming Mode for the bot ('all', 'poke', 'farm')</td>
+		</tr>
+		<tr>
+			<td>--walk [SPEED]</td>
+			<td>-w [SPEED]</td>
+			<td>Walk instead of teleport with given speed (meters per second max 4.16 because of walking end on 15km/h)</td>
+		</tr>
+		<tr>
+			<td>--distance-unit [UNIT]</td>
+			<td>-du [UNIT]</td>
+			<td>Set the unit to display distance in (e.g, km for kilometers, mi for miles, ft for feet)</td>
+		</tr>
+		<tr>
+			<td>--initial-transfer</td>
+			<td>-it</td>
+			<td>Start the bot with a pokemon clean up, keeping only the higher CP of each pokemon. It respects -c as upper limit to release.</td>
+		</tr>
+		<tr>
+			<td>--ign-init-trans [LIST]</td>
+			<td>-ig [LIST]</td>
+			<td>Pass a list of pokemon to ignore during initial transfer (e.g. 017,049,001)</td>
+		</tr>
+		<tr>
+			<td>--max-steps [MAX_STEP]</td>
+			<td>-ms [MAX_STEP]</td>
+			<td>Set the steps around your initial location (DEFAULT 5 mean 25 cells around your location)</td>
+		</tr>
+		<tr>
+			<td>--combat-power [COMBAT_POWER]</td>
+			<td>-cp [COMBAT_POWER]</td>
+			<td>Transfer Pokemon that have CP less than this value (default 100)",</td>
+		</tr>
+		<tr>
+			<td>--pokemon-potential [IV]</td>
+			<td>-iv [IV]</td>
+			<td>Set the ratio for the IV values to transfer (DEFAULT 0.4 eg. 0.4 will transfer a pokemon with IV 0.3)</td>
+		</tr>
+		<tr>
+			<td>--recycle-items</td>
+			<td>-ri</td>
+			<td>Recycle unneeded items automatically</td>
+		</tr>
+		<tr>
+			<td>--item-filter [LIST]</td>
+			<td>-if [LIST]</td>
+			<td>Pass a list of unwanted items to recycle when collected at a Pokestop (e.g, [\"101\",\"102\",\"103\",\"104\"] to recycle potions when collected). Requires --recycle-items. </td>
+		</tr>
+		<tr>
+			<td>--exclude-plugins [LIST]</td>
+			<td>-ep [LIST]</td>
+			<td>Pass a list of plugins to exclude from the loading process (e.g, logger,web).</td>
+		</tr>
+		<tr>
+			<td>--gmapkey [KEY]</td>
+			<td>-k [KEY]</td>
+			<td>Set a google maps API key to use</td>
+		</tr>
+		<tr>
+			<td>--google-directions</td>
+			<td>-gd</td>
+			<td>Bot will use directions from google maps API to navigate</td>
+		</tr>
+		<tr>
+			<td>--debug</td>
+			<td>-d</td>
+			<td>Debug Mode</td>
+		</tr>
+		<tr>
+			<td>--test</td>
+			<td>-t</td>
+			<td>Only parse the specified location</td>
+		</tr>
+		<tr>
+			<td>--fill-incubators</td>
+			<td>-fi</td>
+			<td>Fill incubators with eggs</td>
+		</tr>
+		<tr>
+			<td>--use-all-incubators</td>
+			<td>-ai</td>
+			<td>Use all incubators or only unlimited one</td>
+		</tr>
+	</tbody>
+</table>
 
 ### Command Line Example
     Pokemon Trainer Club (PTC) account:
@@ -94,22 +205,24 @@ pip install -r requirements.txt
     $ python2 pokecli.py -a google -u tejado -p 1234 --location "New York, Washington Square"
 
 ### Bot Configuration via JSON
-    To load arguments for the bot from a JSON file, use the ``--config-json`` argument with the name of a file.
-    Any other command line arguments specified will override the parameters specified in the loaded JSON file.
+To load arguments for the bot from a JSON file, use the ``--config-json`` argument with the name of a file.
+Any other command line arguments specified will override the parameters specified in the loaded JSON file.
 
-    Example - this will load config.json but use cp=1000 and iv=0.7 even if already defined in config.json:
-    $ python2 pokecli.py --config-json config.json -cp 1000 -iv 0.7
+Example - this will load config.json but use cp=1000 and iv=0.7 even if already defined in config.json:
+```
+$ python2 pokecli.py --config-json config.json -cp 1000 -iv 0.7
+```
 
  ### JSON Options
 
 
 ### Advance Releasing Configuration
-    To edit the pokemon release configuration, copy the file ``release_config.json.example`` and rename it to ``release_config.json``
+To edit the pokemon release configuration, copy the file ``release_config.json.example`` and rename it to ``release_config.json``
 
-    Edit this file however you want, but keep in mind:
+Edit this file however you want, but keep in mind:
 
-    1. Pokemon names should always be capitalized and are case-sensitive
-    2. The ``any`` configuration effects every pokemon
+1. Pokemon names should always be capitalized and are case-sensitive
+2. The ``any`` configuration effects every pokemon
     
 ## FAQ
 
