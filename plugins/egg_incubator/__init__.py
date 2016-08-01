@@ -5,7 +5,7 @@ from pokemongo_bot import logger
 
 
 def log(text, color="black"):
-    logger.log(text, color=color, prefix="PokeStop")
+    logger.log(text, color=color, prefix="Incubator")
 
 
 @manager.on("walking_started", priority=1000)
