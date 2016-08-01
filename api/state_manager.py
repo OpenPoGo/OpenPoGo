@@ -1,6 +1,7 @@
 # pylint: disable=unused-argument
 from __future__ import print_function
 
+from api.evolution_result import EvolutionResult
 from pokemongo_bot import logger
 from .player import Player
 from .inventory_parser import InventoryParser
@@ -26,7 +27,8 @@ class StateManager(object):
             "FORT_SEARCH": self._identity,
             "RECYCLE_INVENTORY_ITEM": self._noop,
             "USE_ITEM_EGG_INCUBATOR": self._parse_use_incubator,
-            "GET_HATCHED_EGGS": self._parse_get_hatched_eggs
+            "GET_HATCHED_EGGS": self._parse_get_hatched_eggs,
+            "EVOLVE_POKEMON": self._parse_evolution
         }
 
         # Maps methods to the state objects that they refresh.
@@ -44,7 +46,8 @@ class StateManager(object):
             "PLAYER_UPDATE": [],
             "FORT_DETAILS": ["fort"],
             "FORT_SEARCH": [],
-            "RECYCLE_INVENTORY_ITEM": []
+            "RECYCLE_INVENTORY_ITEM": [],
+            "EVOLVE_POKEMON": ["evolution"]
         }
 
         # Maps methods to the state objects that they invalidate.
@@ -66,7 +69,8 @@ class StateManager(object):
             "PLAYER_UPDATE": ["player", "inventory"],
             "FORT_DETAILS": ["fort"],
             "FORT_SEARCH": ["player", "inventory", "eggs"],
-            "RECYCLE_INVENTORY_ITEM": ["inventory"]
+            "RECYCLE_INVENTORY_ITEM": ["inventory"],
+            "EVOLVE_POKEMON": ["player", "inventory", "pokemon", "pokedex", "candy"]
         }
 
         self.current_state = {}
@@ -232,6 +236,9 @@ class StateManager(object):
                     new_egg_incubators.append(curr_incu)
 
             self._update_state({"egg_incubators": new_egg_incubators})
+
+    def _parse_evolution(self, key, response):
+        self._update_state({"evolution": EvolutionResult(response)})
 
     def _identity(self, key, response):
         self._update_state({key: response})

@@ -23,7 +23,9 @@ def run_flask():
     app.config["SECRET_KEY"] = "OpenPoGoBot"
     socketio = SocketIO(app, logging=False, engineio_logger=False)
 
-    logging_buffer = []
+    cached_events = {
+        "logging": []
+    }
 
     @app.route("/")
     def index():
@@ -35,7 +37,8 @@ def run_flask():
 
     @socketio.on("connect", namespace="/event")
     def connect():
-        socketio.emit("logging", logging_buffer, namespace="/event")
+        for event in cached_events:
+            socketio.emit(event, cached_events[event], namespace="/event")
         logger.log("Web client connected", "yellow", fire_event=False)
 
     @socketio.on("disconnect", namespace="/event")
@@ -45,7 +48,7 @@ def run_flask():
     @manager.on("logging")
     def logging_event(text="", color="black"):
         line = {"output": text, "color": color}
-        logging_buffer.append(line)
+        cached_events["logging"].append(line)
         socketio.emit("logging", [line], namespace="/event")
 
     @manager.on("position_updated")
@@ -56,7 +59,7 @@ def run_flask():
             "coordinates": coordinates,
             "username": bot.get_username()
         }
-
+        cached_events["position"] = emitted_object
         socketio.emit("position", emitted_object, namespace="/event")
 
     @manager.on("gyms_found", priority=-2000)
@@ -67,6 +70,7 @@ def run_flask():
             "gyms": JSONEncodable.encode_list(gyms),
             "username": bot.get_username()
         }
+        cached_events["gyms"] = emitted_object
         socketio.emit("gyms", emitted_object, namespace="/event")
 
     @manager.on("pokestops_found", priority=-2000)
@@ -77,6 +81,7 @@ def run_flask():
             "pokestops": JSONEncodable.encode_list(pokestops),
             "username": bot.get_username()
         }
+        cached_events["pokestops"] = emitted_object
         socketio.emit("pokestops", emitted_object, namespace="/event")
 
     @manager.on("player_update", priority=-2000)
@@ -87,6 +92,7 @@ def run_flask():
             "player": player.to_json_encodable(),
             "username": bot.get_username()
         }
+        cached_events["player"] = emitted_object
         socketio.emit("player", emitted_object, namespace="/event")
 
     @manager.on("inventory_update", priority=-2000)
@@ -98,6 +104,7 @@ def run_flask():
             "inventory": inventory,
             "username": bot.get_username()
         }
+        cached_events["inventory"] = emitted_object
         socketio.emit("inventory", emitted_object, namespace="/event")
 
     @manager.on("pokemon_found", priority=-2000)
@@ -108,6 +115,7 @@ def run_flask():
             "nearby_pokemon": JSONEncodable.encode_list(encounters),
             "username": bot.get_username()
         }
+        cached_events["nearby_pokemon"] = emitted_object
         socketio.emit("nearby_pokemon", emitted_object, namespace="/event")
 
     socketio.run(app, host="0.0.0.0", port=8000, debug=False, use_reloader=False, log_output=False)
