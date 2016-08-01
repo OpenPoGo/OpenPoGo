@@ -26,6 +26,8 @@ def incubate_eggs(bot, coords=None):
         incubators = [incu for incu in inventory["egg_incubators"] if incu.pokemon_id == 0 and (
             bot.config.incubation_use_all or incu.item_id == 901)]
 
+        in_use_count = len(inventory["egg_incubators"]) - len(incubators)
+
         # order eggs by distance longest -> shortest
         eggs_by_distance = sorted(eggs, key=lambda x: x.total_distance, reverse=True)
 
@@ -37,16 +39,18 @@ def incubate_eggs(bot, coords=None):
 
             for egg in eggs_by_distance:
                 if len(incubators) == 0:
-                    log("No more free incubators", "yellow")
+                    log("No more free incubators ({}/{} in use)".format(in_use_count, len(inventory["egg_incubators"])), "yellow")
                     return
 
                 if egg_restrictions is None:
                     incubator = incubators.pop()
                     bot.fire("incubate_egg", incubatior=incubator, egg=egg)
+                    in_use_count += 1
                 else:
                     for incubator in incubators:
                         if incubator.item_id in egg_restrictions:
                             bot.fire("incubate_egg", incubatior=incubator, egg=egg)
+                            in_use_count += 1
 
 
 @manager.on("incubate_egg")
@@ -55,4 +59,4 @@ def incubate_egg(bot, incubator=None, egg=None):
         return
 
     bot.api_wrapper.use_item_egg_incubator(item_id=incubator.unique_id, pokemon_id=egg.unique_id).call()
-    log("Put an {}km egg into an incubator".format(int(egg.total_distance)), "green")
+    log("Put a {}km egg into an incubator".format(int(egg.total_distance)), "green")
