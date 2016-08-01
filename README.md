@@ -110,7 +110,7 @@ Example - this will load config.json but use cp=1000 and iv=0.7 even if already 
 $ python2 pokecli.py --config-json config.json -cp 1000 -iv 0.7
 ```
 
- ### JSON Options
+### JSON Options
 
 
 ### Advance Releasing Configuration
