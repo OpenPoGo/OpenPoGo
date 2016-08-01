@@ -44,7 +44,7 @@ def _log(text="", color="black", prefix=None):
     output += string
     if color in color_hex:
         output = color_hex[color] + output + Style.RESET_ALL
-    if platform.system() == "Windows" || platform.system() == "FreeBSD":
+    if platform.system() == "Windows" or platform.system() == "FreeBSD":
         print(output.encode('cp437', errors='replace').decode('cp437'))
     else:
         print(output)
