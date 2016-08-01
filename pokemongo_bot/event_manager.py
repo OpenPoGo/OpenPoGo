@@ -63,6 +63,10 @@ class Event(object):
                         listener_args[key] = kwargs.get(key)
                     return_dict = listener(**listener_args)
 
+                # If a handler returns False, this means that the event should be cancelled.
+                if return_dict is False:
+                    return False
+
                 # Update the list of arguments to be used for the next function
                 # This enables "pipeline"-like functionality - if arguments to an event handler
                 # need to be processed in some way, another handler with higher priority can be
