@@ -79,6 +79,21 @@ class Stepper(object):
 
             self.bot.heartbeat()
 
+    def snap_to(self, to_lat, to_lng, to_alt):
+        # type: (float, float, float) -> None
+        """
+            This method is to correct a position you are near to. If you try and snap a distance over 10 meters,
+            it will fail.
+        """
+        # type: (float, float, float) -> None
+        dist = distance(self.current_lat, self.current_lng, to_lat, to_lng)
+
+        # Never snap big distances
+        if dist > 10:
+            return
+
+        self._jump_to(to_lat, to_lng, to_alt)
+
     def _jump_to(self, lat, lng, alt):
         # type: (float, float, float) -> None
         self.api_wrapper.set_position(lat, lng, alt)

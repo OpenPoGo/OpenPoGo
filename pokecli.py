@@ -83,6 +83,7 @@ def init_config():
         "initial_transfer": False,
         "navigator": "fort",
         "navigator_waypoints": [],
+        "navigator_campsite": None,
         "path_finder": "google",
         "debug": False,
         "test": False
@@ -121,7 +122,7 @@ def init_config():
     parser.add_argument(
         "-n",
         "--navigator",
-        help="Navigator to use to create a destination. <fort|waypoint> (default fort)",
+        help="Navigator to use to create a destination. <fort|waypoint|campsite> (default fort)",
         type=str,
         dest="navigator")
     parser.add_argument(
@@ -137,6 +138,12 @@ def init_config():
         type=str,
         dest="walk",
         nargs='*')
+    parser.add_argument(
+        "-camp",
+        "--campsite",
+        help="Waypoint to visit in coordinates. Only valid if navigator is campsite",
+        type=str,
+        dest="navigator_campsite")
     parser.add_argument(
         "-du",
         "--distance-unit",

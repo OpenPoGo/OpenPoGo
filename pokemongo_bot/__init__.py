@@ -19,7 +19,7 @@ from pokemongo_bot.item_list import Item
 from pokemongo_bot.mapper import Mapper
 from pokemongo_bot.stepper import Stepper
 from pokemongo_bot.plugins import PluginManager
-from pokemongo_bot.navigation import FortNavigator, WaypointNavigator
+from pokemongo_bot.navigation import FortNavigator, WaypointNavigator, CamperNavigator
 from api import PoGoApi
 from geopy.geocoders import GoogleV3  # type: ignore
 # Uncomment for type annotations on Python 3
@@ -77,6 +77,8 @@ class PokemonGoBot(object):
             self.navigator = FortNavigator(self)  # pylint: disable=redefined-variable-type
         elif self.config.navigator == 'waypoint':
             self.navigator = WaypointNavigator(self)  # pylint: disable=redefined-variable-type
+        elif self.config.navigator == 'camper':
+            self.navigator = CamperNavigator(self)  # pylint: disable=redefined-variable-type
 
     def fire(self, event, *args, **kwargs):
         # type: (str, *Any, **Any) -> None
