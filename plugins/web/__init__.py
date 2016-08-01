@@ -6,6 +6,7 @@ from flask_socketio import SocketIO, emit
 
 from pokemongo_bot import logger
 from pokemongo_bot.event_manager import manager
+from api.json_encodable import JSONEncodable
 
 # pylint: disable=unused-variable, unused-argument
 
@@ -32,22 +33,6 @@ def run_flask():
     def static_proxy(path):
         return app.send_static_file(path)
 
-    @manager.on("logging")
-    def logging_event(text="", color="black"):
-        line = {"output": text, "color": color}
-        logging_buffer.append(line)
-        socketio.emit("logging", [line], namespace="/event")
-
-    @manager.on("position_updated")
-    def position_update(bot, coords=None):
-        if coords is None:
-            return
-
-        socketio.emit("position", {
-            "user": bot.config.username,
-            "coords": coords
-        }, namespace="/event")
-
     @socketio.on("connect", namespace="/event")
     def connect():
         socketio.emit("logging", logging_buffer, namespace="/event")
@@ -56,6 +41,74 @@ def run_flask():
     @socketio.on("disconnect", namespace="/event")
     def disconnect():
         logger.log("Web client disconnected", "yellow", fire_event=False)
+
+    @manager.on("logging")
+    def logging_event(text="", color="black"):
+        line = {"output": text, "color": color}
+        logging_buffer.append(line)
+        socketio.emit("logging", [line], namespace="/event")
+
+    @manager.on("position_updated")
+    def position_update(bot, coordinates=None):
+        if coordinates is None:
+            return
+        emitted_object = {
+            "coordinates": coordinates,
+            "username": bot.get_username()
+        }
+
+        socketio.emit("position", emitted_object, namespace="/event")
+
+    @manager.on("gyms_found", priority=-2000)
+    def gyms_found_event(bot=None, gyms=None):
+        if gyms is None or len(gyms) == 0:
+            return
+        emitted_object = {
+            "gyms": JSONEncodable.encode_list(gyms),
+            "username": bot.get_username()
+        }
+        socketio.emit("gyms", emitted_object, namespace="/event")
+
+    @manager.on("pokestops_found", priority=-2000)
+    def pokestops_found_event(bot=None, pokestops=None):
+        if pokestops is None or len(pokestops) == 0:
+            return
+        emitted_object = {
+            "pokestops": JSONEncodable.encode_list(pokestops),
+            "username": bot.get_username()
+        }
+        socketio.emit("pokestops", emitted_object, namespace="/event")
+
+    @manager.on("player_update", priority=-2000)
+    def player_updated_event(bot=None, player=None):
+        if player is None:
+            return
+        emitted_object = {
+            "player": player.to_json_encodable(),
+            "username": bot.get_username()
+        }
+        socketio.emit("player", emitted_object, namespace="/event")
+
+    @manager.on("inventory_update", priority=-2000)
+    def inventory_updated_event(bot, inventory=None):
+        # type: (PokemonGoBot, Dict[int, int]) -> None
+        if inventory is None or inventory.get("count", 0) == 0:
+            return
+        emitted_object = {
+            "inventory": inventory,
+            "username": bot.get_username()
+        }
+        socketio.emit("inventory", emitted_object, namespace="/event")
+
+    @manager.on("pokemon_found", priority=-2000)
+    def pokemon_found_event(bot=None, encounters=None):
+        if encounters is None or len(encounters) == 0:
+            return
+        emitted_object = {
+            "nearby_pokemon": JSONEncodable.encode_list(encounters),
+            "username": bot.get_username()
+        }
+        socketio.emit("nearby_pokemon", emitted_object, namespace="/event")
 
     socketio.run(app, host="0.0.0.0", port=8000, debug=False, use_reloader=False, log_output=False)
 

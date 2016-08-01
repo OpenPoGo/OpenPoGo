@@ -3,7 +3,7 @@ from __future__ import print_function
 
 from pokemongo_bot import logger
 from .player import Player
-from .inventory import Inventory
+from .inventory_parser import InventoryParser
 from .worldmap import WorldMap, Gym, PokeStop
 from .encounter import Encounter
 from .item import Incubator
@@ -155,7 +155,7 @@ class StateManager(object):
         self._update_state({"player": current_player})
 
     def _parse_inventory(self, key, response):
-        new_inventory = Inventory(response)
+        new_inventory = InventoryParser(response)
 
         new_state = {
             "inventory": new_inventory.items,
@@ -163,7 +163,7 @@ class StateManager(object):
             "candy": new_inventory.candy,
             "pokemon": new_inventory.pokemon,
             "eggs": new_inventory.eggs,
-            "egg_incubators":new_inventory.egg_incubators
+            "egg_incubators": new_inventory.egg_incubators
         }
 
         current_player = self.current_state.get("player", None)
@@ -220,7 +220,7 @@ class StateManager(object):
                 self.mark_returned_stale("GET_INVENTORY")
 
     def _parse_use_incubator(self, key, response):
-        if response["result"] == 1:
+        if response.get("result", 0) == 1:
 
             current_egg_incubators = self.current_state.get("egg_incubators", [])
             new_egg_incubators = []
@@ -232,7 +232,6 @@ class StateManager(object):
                     new_egg_incubators.append(curr_incu)
 
             self._update_state({"egg_incubators": new_egg_incubators})
-
 
     def _identity(self, key, response):
         self._update_state({key: response})
