@@ -46,7 +46,7 @@ class Event(object):
         # Sort events by priorities from greatest to least
         priorities = sorted(self.listeners, key=lambda event_priority: event_priority)
         for priority in priorities:
-            for listener in self.listeners[priority]:
+            for listener in list(self.listeners[priority]):
 
                 # Pass in the event name to the handler
                 kwargs["event_name"] = self.name

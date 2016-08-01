@@ -2,8 +2,10 @@
 from builtins import str
 import time
 
+from api.json_encodable import JSONEncodable
 
-class Fort(object):
+
+class Fort(JSONEncodable):
     def __init__(self, data):
         self.fort_id = data.get("id", "")
         self.fort_name = data.get("name", "Unknown").encode('ascii', 'replace')
@@ -43,7 +45,7 @@ class Gym(Fort):
         self.gym_points = data.get("gym_points", 0)
 
 
-class Cell(object):
+class Cell(JSONEncodable):
     def __init__(self, data):
         self.spawn_points = []
         self.gyms = []
@@ -67,7 +69,7 @@ class Cell(object):
                 self.gyms.append(Gym(fort))
 
 
-class WorldMap(object):
+class WorldMap(JSONEncodable):
     def __init__(self):
         self.cells = []
 
