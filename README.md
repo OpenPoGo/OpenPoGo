@@ -65,32 +65,33 @@ $ pyhton pokecli.py [flags]
 ```
 
 ####  Flags
-| Flag | Short Flag | Description |
-| --- | --- | --- |
-| --help | -h | Show this help message and exit |
-| --config-json | -j | Load a config JSON file. Any arguments specified on command line override those specified in the file. |
-| --auth-service [AUTH_SERVICE] | -a [AUTH_SERVICE] | Auth Service ('ptc' or 'google') |
-| --username [USERNAME] | -u [USERNAME] | Username |
-| --password [PASSWORD] | -p [PASSWORD] | Password |
-| --location [LOCATION] | -l [LOCATION] | Location (Address or 'xx.yyyy,zz.ttttt') |
-| --location-cache | -lc | Bot will start at last known location |
-| --mode [MODE] | -m [MODE] | Set farming Mode for the bot ('all', 'poke', 'farm') |
-| --walk [SPEED] | -w [SPEED] | Walk instead of teleport with given speed (meters per second max 4.16 because of walking end on 15km/h) |
-| --distance-unit [UNIT] | -du [UNIT] | Set the unit to display distance in (e.g, km for kilometers, mi for miles, ft for feet) |
-| --initial-transfer | -it | Start the bot with a pokemon clean up, keeping only the higher CP of each pokemon. It respects -c as upper limit to release. |
-| --ign-init-trans [LIST] | -ig [LIST] | Pass a list of pokemon to ignore during initial transfer (e.g. 017,049,001) |
-| --max-steps [MAX_STEP] | -ms [MAX_STEP] | Set the steps around your initial location (DEFAULT 5 mean 25 cells around your location) |
-| --combat-power [COMBAT_POWER] | -cp [COMBAT_POWER] | Transfer Pokemon that have CP less than this value (default 100)", |
-| --pokemon-potential [IV] | -iv [IV] | Set the ratio for the IV values to transfer (DEFAULT 0.4 eg. 0.4 will transfer a pokemon with IV 0.3) |
-| --recycle-items | -ri | Recycle unneeded items automatically |
-| --item-filter [LIST] | -if [LIST] | Pass a list of unwanted items to recycle when collected at a Pokestop (e.g, [\"101\",\"102\",\"103\",\"104\"] to recycle potions when collected). Requires --recycle-items. |
-| --exclude-plugins [LIST] | -ep [LIST] | Pass a list of plugins to exclude from the loading process (e.g, logger,web). |
-| --gmapkey [KEY] | -k [KEY] | Set a google maps API key to use |
-| --google-directions | -gd | Bot will use directions from google maps API to navigate |
-| --debug | -d | Debug Mode |
-| --test | -t | Only parse the specified location |
-| --fill-incubators | -fi | Fill incubators with eggs |
-| --use-all-incubators | -ai | Use all incubators or only unlimited one |
+| Flag                          | Short Flag         | Description                                                                                                                                                                 |
+|-------------------------------|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --help                        | -h                 | Show this help message and exit                                                                                                                                             |
+| --config-json                 | -j                 | Load a config JSON file. Any arguments specified on command line override those specified in the file.                                                                      |
+| --auth-service [AUTH_SERVICE] | -a [AUTH_SERVICE]  | Auth Service ('ptc' or 'google')                                                                                                                                            |
+| --username [USERNAME]         | -u [USERNAME]      | Username                                                                                                                                                                    |
+| --password [PASSWORD]         | -p [PASSWORD]      | Password                                                                                                                                                                    |
+| --location [LOCATION]         | -l [LOCATION]      | Location (Address or 'xx.yyyy,zz.ttttt')                                                                                                                                    |
+| --location-cache              | -lc                | Bot will start at last known location                                                                                                                                       |
+| --mode [MODE]                 | -m [MODE]          | Set farming Mode for the bot ('all', 'poke', 'farm')                                                                                                                        |
+| --walk [SPEED]                | -w [SPEED]         | Walk instead of teleport with given speed (meters per second max 4.16 because of walking end on 15km/h)                                                                     |
+| --distance-unit [UNIT]        | -du [UNIT]         | Set the unit to display distance in (e.g, km for kilometers, mi for miles, ft for feet)                                                                                     |
+| --initial-transfer            | -it                | Start the bot with a pokemon clean up, keeping only the higher CP of each pokemon. It respects -c as upper limit to release.                                                |
+| --ign-init-trans [LIST]       | -ig [LIST]         | Pass a list of pokemon to ignore during initial transfer (e.g. 017,049,001)                                                                                                 |
+| --max-steps [MAX_STEP]        | -ms [MAX_STEP]     | Set the steps around your initial location (DEFAULT 5 mean 25 cells around your location)                                                                                   |
+| --combat-power [COMBAT_POWER] | -cp [COMBAT_POWER] | Transfer Pokemon that have CP less than this value (default 100)",                                                                                                          |
+| --pokemon-potential [IV]      | -iv [IV]           | Set the ratio for the IV values to transfer (DEFAULT 0.4 eg. 0.4 will transfer a pokemon with IV 0.3)                                                                       |
+| --recycle-items               | -ri                | Recycle unneeded items automatically                                                                                                                                        |
+| --item-filter [LIST]          | -if [LIST]         | Pass a list of unwanted items to recycle when collected at a Pokestop (e.g, [\"101\",\"102\",\"103\",\"104\"] to recycle potions when collected). Requires --recycle-items. |
+| --exclude-plugins [LIST]      | -ep [LIST]         | Pass a list of plugins to exclude from the loading process (e.g, logger,web).                                                                                               |
+| --gmapkey [KEY]               | -k [KEY]           | Set a google maps API key to use                                                                                                                                            |
+| --google-directions           | -gd                | Bot will use directions from google maps API to navigate                                                                                                                    |
+| --debug                       | -d                 | Debug Mode                                                                                                                                                                  |
+| --test                        | -t                 | Only parse the specified location                                                                                                                                           |
+| --fill-incubators             | -fi                | Fill incubators with eggs                                                                                                                                                   |
+| --use-all-incubators          | -ai                | Use all incubators or only unlimited one                                                                                                                                    |
+
 
 ### Command Line Example
     Pokemon Trainer Club (PTC) account:
