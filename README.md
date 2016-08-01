@@ -188,6 +188,7 @@ Here are the available plugins:
 |     **Plugins**    |
 |:------------------:|
 | `catch_pokemon`    |
+| `egg_incubator`    |
 | `recycle_items`    |
 | `spin_pokestop`    |
 | `transfer_pokemon` |
