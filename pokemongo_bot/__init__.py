@@ -34,7 +34,7 @@ class PokemonGoBot(object):
         self.config = config
         self.pokemon_list = json.load(open('data/pokemon.json'))
         self.item_list = {}
-        for item_id, item_name in json.load(open('data/items.json')).iteritems():
+        for item_id, item_name in json.load(open('data/items.json')).items():
             self.item_list[int(item_id)] = item_name
 
         self.log = None

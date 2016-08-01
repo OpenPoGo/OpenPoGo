@@ -85,7 +85,7 @@ def pokemon_found(bot, encounters=None):
                     log("No ball selected as all balls are low in stock. Saving for better Pokemon.", color="red")
                     return
 
-                log("Using {}... ({} left!)".format(bot.item_list[str(pokeball)], balls_stock[pokeball]-1))
+                log("Using {}... ({} left!)".format(bot.item_list[pokeball], balls_stock[pokeball]-1))
 
                 balls_stock[pokeball] -= 1
                 total_pokeballs -= 1

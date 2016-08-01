@@ -41,7 +41,7 @@ def recycle_items(bot, recyclable_items=None):
 
     for item_type in recyclable_items:
         quantity = recyclable_items[item_type]
-        item_name = bot.item_list[str(item_type)]
+        item_name = bot.item_list[item_type]
         log("Recycling {} {}{}".format(quantity, item_name, "s" if quantity > 1 else ""), color="green")
         bot.api_wrapper.recycle_inventory_item(item_id=item_type, count=quantity).call()
         recycled_items += quantity

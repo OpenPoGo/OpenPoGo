@@ -9,7 +9,6 @@
     "use_all_incubators":false,
     "cp": 100,
     "max_steps": 50,
-    "mode": "all",
     "walk": 4.16,
     "initial_transfer": false,
     "recycle_items": false,
@@ -17,11 +16,12 @@
     "location_cache": true,
     "distance_unit": "km",
     "item_filter": {
-        "1": { "keep": 50 },
-        "101": { "keep": 10 },
-        "102": { "keep": 30 },
-        "103": { "keep": 30 },
-        "201": { "keep": 30 },
-        "701": { "keep": 100 }
+        "1": 100,
+        "101": 0,
+        "102": 0,
+        "103": 10,
+        "104": 10,
+        "201": 10,
+        "202": 10
     }
 }
