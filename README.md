@@ -61,7 +61,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```
-$ pyhton pokecli.py [flags]
+$ python pokecli.py [flags]
 ```
 
 ####  Flags
