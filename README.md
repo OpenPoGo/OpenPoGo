@@ -160,18 +160,17 @@ ignore:
   - Ekans
   - Zubat
 ```
-### How do I use the map??
-You can either view the map via opening the html file, or by serving it with SimpleHTTPServer (runs on localhost:8000)  
-To use SimpleHTTPServer:  
-```
-$ python -m SimpleHTTPServer [port]
-```
-The default port is 8080, you can change that by giving a port number.
-Anything above port 1000 does not require root.
-You will need to set your username(s) in the userdata.js file before opening:  
-Copy userdata.js.example to userdata.js and edit with your favorite text editor.
-put your username in the quotes instead of "username"
-If using multiple usernames format like this:  
+### How do I use the map?
+
+The web plugin uses `Flask` to open a server on port `8000`. Before visiting the site, you will need to set your username(s) in the `userdata.js` file:
+
+1. Copy `userdata.js.example` to `userdata.js` 
+2. Open the `userdata.js` file in your editor.
+3. Edit the the username to match yours.
+4. Change other settings if you want.
+5. Browse `http://localhost:8000` and enjoy!
+
+If you are using multiple usernames, the format is like this:  
 ```
 var users = ["username1","username2"];
 ```
