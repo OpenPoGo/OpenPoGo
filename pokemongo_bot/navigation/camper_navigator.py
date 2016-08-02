@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from math import floor
 
 from pokemongo_bot import logger

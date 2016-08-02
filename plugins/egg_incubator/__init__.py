@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from pokemongo_bot import sleep
 from pokemongo_bot.event_manager import manager
 from pokemongo_bot import logger

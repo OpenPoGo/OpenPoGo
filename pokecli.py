@@ -26,6 +26,7 @@ Author: tjado <https://github.com/tejado>
 """
 
 from __future__ import print_function
+from __future__ import unicode_literals
 from getpass import getpass
 # pylint: disable=redefined-builtin
 from builtins import input
