@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import time
+import platform
 from math import ceil
 
 from pokemongo_bot.human_behaviour import sleep
