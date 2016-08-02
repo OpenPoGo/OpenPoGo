@@ -56,8 +56,8 @@ def _do_evolve(bot, name):
         # bot.get_pokemon()
 
 def _get_base_pokemon(bot, name):
-    pokemon_id = 0
-    num_evolve = 0
+    pokemon_id = None
+    num_evolve = None
     pokemon_name = name
     for pokemon in bot.pokemon_list:
         if pokemon['Name'] is not name:
