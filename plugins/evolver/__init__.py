@@ -30,7 +30,7 @@ def _do_evolve(bot, name):
             pokemon_evolve = [pokemon for pokemon in pokemon_list if pokemon.pokemon_id is pokemon_id]
             if pokemon_evolve is None:
                 return
-            pokemon_evolve.sort(key = lambda p: p.combat_power, reverse=True)
+            pokemon_evolve.sort(key=lambda p: p.combat_power, reverse=True)
 
             num_evolved = 0
             while num_evolve < pokemon_candies and pokemon_evolve:
