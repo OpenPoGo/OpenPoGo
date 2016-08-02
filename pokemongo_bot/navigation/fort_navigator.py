@@ -1,5 +1,5 @@
-from datetime import datetime
 from __future__ import unicode_literals
+from datetime import datetime
 import platform
 
 from pokemongo_bot import logger
