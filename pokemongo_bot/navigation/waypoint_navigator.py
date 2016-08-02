@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from pokemongo_bot import logger
 from pokemongo_bot.navigation.navigator import Navigator
 from pokemongo_bot.utils import distance, format_dist
