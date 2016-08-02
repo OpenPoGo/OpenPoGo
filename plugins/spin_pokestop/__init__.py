@@ -68,7 +68,11 @@ def spin_pokestop(bot, pokestop=None):
                                                 latitude=pokestop.latitude,
                                                 longitude=pokestop.longitude).call()
     dist = distance(bot.stepper.current_lat, bot.stepper.current_lng, pokestop.latitude, pokestop.longitude)
-    log("Nearby PokeStop found \"{}\" ({} away)".format(fort_details["fort"].fort_name,
+    if platform.system() == "Windows" or platform.system() == "FreeBSD" or platform.system()[:6] == "CYGWIN":
+        fort_name = repr(fort_details["fort"].fort_name)
+    else
+        fort_name = fort_details["fort"].fort_name
+    log("Nearby PokeStop found \"{}\" ({} away)".format(fort_name,
                                                         format_dist(dist, bot.config.distance_unit)), color="yellow")
 
     log("Spinning...", color="yellow")
