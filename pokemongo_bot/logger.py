@@ -41,7 +41,7 @@ def _log(text="", color="black", prefix=None):
     output = u"[" + time.strftime("%Y-%m-%d %H:%M:%S") + u"] "
     if prefix is not None:
         output += u"[{}] ".format(str(prefix))
-    if platform.system() == "Windows" or platform.system() == "FreeBSD":
+    if platform.system() == "Windows" or platform.system() == "FreeBSD" or platform.system() == "CYGWIN_NT-6.1":
         output += repr(string)
     else:
         output += string
