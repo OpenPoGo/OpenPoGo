@@ -1,5 +1,4 @@
 from datetime import datetime
-import platform
 
 from pokemongo_bot import logger
 from pokemongo_bot.navigation.navigator import Navigator
