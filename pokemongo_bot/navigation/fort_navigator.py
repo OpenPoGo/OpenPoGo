@@ -35,8 +35,6 @@ class FortNavigator(Navigator):
                 response_dict = self.api_wrapper.call()
                 if response_dict is None:
                     fort_name = fort_id
-                elif platform.system() == "Windows" or platform.system() == "FreeBSD" or platform.system()[:6] == "CYGWIN":
-                    fort_name = repr(response_dict["fort"].fort_name)
                 else:
                     fort_name = response_dict["fort"].fort_name
 
