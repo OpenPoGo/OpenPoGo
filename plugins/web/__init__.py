@@ -27,13 +27,24 @@ def run_flask():
         "logging": []
     }
 
+    active_bots = set()
+
+    @manager.on("bot_initialized")
+    def bot_initialized(bot):
+        active_bots.add(bot.get_username())
+        socketio.emit("bot_initialized", bot.get_username(), namespace="/event")
+
     @app.route("/")
     def index():
         return app.send_static_file("index.html")
 
-    @app.route('/<path:path>')
+    @app.route("/<path:path>")
     def static_proxy(path):
         return app.send_static_file(path)
+
+    @app.route("/get-running-bots")
+    def get_running_bots():
+        return jsonify(list(active_bots))
 
     @socketio.on("connect", namespace="/event")
     def connect():

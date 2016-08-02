@@ -15,6 +15,7 @@ class Egg(JSONEncodable):
 class Pokemon(JSONEncodable):
 
     def __init__(self, data):
+        self.data = data
         self.unique_id = data.get("id", 0)
         self.pokemon_id = data.get("pokemon_id", 0)
         self.hp = data.get("individual_stamina", 0)

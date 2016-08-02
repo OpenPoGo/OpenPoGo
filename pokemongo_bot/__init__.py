@@ -80,6 +80,8 @@ class PokemonGoBot(object):
         elif self.config.navigator == 'camper':
             self.navigator = CamperNavigator(self)  # pylint: disable=redefined-variable-type
 
+        self.fire('bot_initialized')
+
     def fire(self, event, *args, **kwargs):
         # type: (str, *Any, **Any) -> None
         manager.fire_with_context(event, self, *args, **kwargs)
