@@ -141,7 +141,7 @@ class PokemonGoBot(object):
         if response_dict is not None:
             player = response_dict['player']
             inventory = response_dict['inventory']
-            self.update_candies(response_dict['candy'])
+            self.candies = response_dict['candy']
             pokemon = response_dict['pokemon']
             creation_date = player.get_creation_date()
 
@@ -183,11 +183,6 @@ class PokemonGoBot(object):
         self.api_wrapper.get_player().get_inventory()
         return self.api_wrapper.call()
 
-    def update_candies(self, candies):
-        for key in candies:
-            self.candies[key] = candies[key]
-        self._candies_use_name()
-
     def add_candies(self, name=None, pokemon_candies=None):
         for pokemon in self.pokemon_list:
             if pokemon['Name'] is not name:
@@ -195,9 +190,9 @@ class PokemonGoBot(object):
             else:
                 previous_evolutions = pokemon.get("Previous evolution(s)", [])
                 if previous_evolutions:
-                    candy_name = previous_evolutions[0]['Name']
+                    candy_name = previous_evolutions[0]['Number']
                 else:
-                    candy_name = name
+                    candy_name = pokemon.get("Number")
 
                 if self.candies.get(candy_name, None) is not None:
                     self.candies[candy_name] += pokemon_candies
@@ -222,15 +217,6 @@ class PokemonGoBot(object):
             if item_id in balls_stock:
                 balls_stock[item_id] = inventory_list[item_id]
         return balls_stock
-
-    def _candies_use_name(self):
-        for pokemon in self.pokemon_list:
-            poke_number = int(pokemon['Number'])
-            if self.candies.get(poke_number, None) is not None:
-                self.candies[pokemon['Name']] = self.candies[poke_number]
-                del self.candies[poke_number]
-            else:
-                continue
 
     def _set_starting_position(self):
 
