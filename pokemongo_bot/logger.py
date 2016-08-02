@@ -2,7 +2,6 @@
 from __future__ import print_function
 from builtins import str
 import time
-import platform
 
 from colorama import Fore, Back, Style
 from pokemongo_bot.event_manager import manager
@@ -41,10 +40,7 @@ def _log(text="", color="black", prefix=None):
     output = u"[" + time.strftime("%Y-%m-%d %H:%M:%S") + u"] "
     if prefix is not None:
         output += u"[{}] ".format(str(prefix))
-    if platform.system() == "Windows" or platform.system() == "FreeBSD" or platform.system() == "CYGWIN_NT-6.1":
-        output += repr(string)
-    else:
-        output += string
+    output += string
     if color in color_hex:
         output = color_hex[color] + output + Style.RESET_ALL
     print(output)
