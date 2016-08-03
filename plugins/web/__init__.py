@@ -14,29 +14,42 @@ logging.getLogger('socketio').disabled = True
 logging.getLogger('engineio').disabled = True
 logging.getLogger('werkzeug').disabled = True
 
+google_maps_api_key = None
 
 def run_flask():
     root_dir = os.path.join(os.getcwd(), 'web')
-    app = Flask(__name__, static_folder=root_dir)
+    app = Flask(__name__, static_folder=root_dir, template_folder=root_dir)
     app.use_reloader = False
     app.debug = False
     app.config["SECRET_KEY"] = "OpenPoGoBot"
     socketio = SocketIO(app, logging=False, engineio_logger=False)
 
-    cached_events = {
-        "logging": []
-    }
+    cached_events = {}
 
-    active_bots = set()
+    active_bots = {}
 
     @manager.on("bot_initialized")
     def bot_initialized(bot):
-        active_bots.add(bot.get_username())
-        socketio.emit("bot_initialized", bot.get_username(), namespace="/event")
+        global google_maps_api_key
+        if google_maps_api_key is None or len(google_maps_api_key) == 0:
+            google_maps_api_key = bot.config.gmapkey
+
+        emitted_object = {
+            "username": bot.get_username(),
+            "coordinates": bot.get_position()
+        }
+
+        active_bots[bot.get_username()] = emitted_object
+        socketio.emit("bot_initialized", [emitted_object], namespace="/event")
 
     @app.route("/")
     def index():
-        return app.send_static_file("index.html")
+        if len(active_bots) == 0:
+            return "No bots currently active."
+        global google_maps_api_key
+        if google_maps_api_key is None or len(google_maps_api_key) == 0:
+            return "No Google Maps API key provided."
+        return render_template("index.html", google_maps_api_key=google_maps_api_key)
 
     @app.route("/<path:path>")
     def static_proxy(path):
@@ -44,12 +57,11 @@ def run_flask():
 
     @app.route("/get-running-bots")
     def get_running_bots():
-        return jsonify(list(active_bots))
+        return jsonify(active_bots)
 
     @socketio.on("connect", namespace="/event")
     def connect():
-        for event in cached_events:
-            socketio.emit(event, cached_events[event], namespace="/event")
+        socketio.emit("bot_initialized", [active_bots[bot] for bot in active_bots], namespace="/event")
         logger.log("Web client connected", "yellow", fire_event=False)
 
     @socketio.on("disconnect", namespace="/event")
@@ -59,7 +71,6 @@ def run_flask():
     @manager.on("logging")
     def logging_event(text="", color="black"):
         line = {"output": text, "color": color}
-        cached_events["logging"].append(line)
         socketio.emit("logging", [line], namespace="/event")
 
     @manager.on("position_updated")
@@ -71,6 +82,7 @@ def run_flask():
             "username": bot.get_username()
         }
         cached_events["position"] = emitted_object
+        active_bots[bot.get_username()]["coordinates"] = coordinates
         socketio.emit("position", emitted_object, namespace="/event")
 
     @manager.on("gyms_found", priority=-2000)
