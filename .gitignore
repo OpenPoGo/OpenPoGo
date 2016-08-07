@@ -33,5 +33,5 @@ release_config.json
 # Shared libraries
 encrypt.dll
 libencrypt.so
-libencrypt_darwin.so
+libencrypt-darwin.so
 encrypt.c

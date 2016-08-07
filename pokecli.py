@@ -104,7 +104,7 @@ def init_config():
     elif platform.system() == "Linux":
         default_config["load_library"] = "libencrypt.so"
     elif platform.system() == "Darwin":
-        default_config["load_library"] = "libencrypt_darwin.so"
+        default_config["load_library"] = "libencrypt-darwin.so"
 
     parser = argparse.ArgumentParser()
 
