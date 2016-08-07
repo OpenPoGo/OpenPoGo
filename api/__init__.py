@@ -101,12 +101,10 @@ class PoGoApi(object):
                 print("[API] Requesting too fast. Retrying in 10 seconds...")
                 time.sleep(10)
                 continue
-            """
             except TypeError:
                 print("[API] Failed to perform API call (servers might be offline). Retrying in 10 seconds...")
                 time.sleep(10)
                 continue
-            """
 
             if results is False or results is None or results.get('status_code', 1) != 1:
                 print("[API] API call failed. Retrying in 10 seconds...")
