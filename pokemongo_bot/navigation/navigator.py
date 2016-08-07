@@ -13,5 +13,5 @@ class Navigator(object):
         self.stepper = bot.stepper
 
     def navigate(self, map_cells):
-        # type: (List[Cell]) -> None
+        # type: (List[Cell]) -> List[Direction]
         raise NotImplementedError

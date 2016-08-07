@@ -7,7 +7,7 @@ from pokemongo_bot.utils import distance
 class FortNavigator(Navigator):
 
     def navigate(self, map_cells):
-        # type: (List[Cell]) -> None
+        # type: (List[Cell]) -> List([Destination])
 
         for cell in map_cells:
             pokestops = [pokestop for pokestop in cell.pokestops if
