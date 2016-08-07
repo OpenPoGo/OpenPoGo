@@ -70,10 +70,11 @@ class CamperNavigatorTest(unittest.TestCase):
             })
         ]
 
-    def _create_pokestop(self, id, lat, lng):
+    @staticmethod
+    def _create_pokestop(name, lat, lng):
         return {
-            "fort_id": str(id),
-            "name": str(id),
+            "fort_id": str(name),
+            "name": str(name),
             "latitude": lat,
             "longitude": lng,
             "enabled": 1,

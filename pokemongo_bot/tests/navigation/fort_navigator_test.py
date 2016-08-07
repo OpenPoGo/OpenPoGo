@@ -14,7 +14,7 @@ class FortNavigatorTest(unittest.TestCase):
             "max_steps": 2
         })
         api_wrapper = bot.api_wrapper
-        pgoapi = api_wrapper._api
+        pgoapi = api_wrapper._api  # pylint: disable=protected-access
 
         pgoapi.set_response('fort_details', self._create_pokestop("Test Stop", 51.5043872, -0.0741802))
         pgoapi.set_response('fort_details', self._create_pokestop("Test Stop 2", 51.5060435, -0.073983))
@@ -45,7 +45,7 @@ class FortNavigatorTest(unittest.TestCase):
             "max_steps": 2
         })
         api_wrapper = bot.api_wrapper
-        pgoapi = api_wrapper._api
+        pgoapi = api_wrapper._api  # pylint: disable=protected-access
 
         pgoapi.set_response('fort_details', self._create_pokestop("Test Stop", 51.5043872, -0.0741802))
         pgoapi.set_response('fort_details', {})
@@ -87,10 +87,11 @@ class FortNavigatorTest(unittest.TestCase):
             })
         ]
 
-    def _create_pokestop(self, id, lat, lng):
+    @staticmethod
+    def _create_pokestop(name, lat, lng):
         return {
-            "fort_id": str(id),
-            "name": str(id),
+            "fort_id": str(name),
+            "name": str(name),
             "latitude": lat,
             "longitude": lng,
             "enabled": 1,

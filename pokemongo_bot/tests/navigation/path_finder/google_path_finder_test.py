@@ -6,7 +6,7 @@ from pokemongo_bot.tests import create_mock_bot
 
 
 class GooglePathFinderTest(unittest.TestCase):
-    def test_path(self):
+    def test_path(self): # pylint: disable=no-self-use
 
         with patch('googlemaps.Client') as GoogleMapsClient:
             client = Mock()
@@ -69,7 +69,8 @@ class GooglePathFinderTest(unittest.TestCase):
             assert lat == 51.5060435
             assert lng == -0.073983
 
-    def test_path_no_route(self):
+    @staticmethod
+    def test_path_no_route():
 
         with patch('googlemaps.Client') as GoogleMapsClient:
             client = Mock()

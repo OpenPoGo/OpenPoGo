@@ -1,13 +1,9 @@
-import sys, os
 from argparse import Namespace
+
+from mock import Mock, MagicMock
 
 import pokemongo_bot
 from pokemongo_bot import Stepper
-
-myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../')
-
-from mock import Mock, MagicMock
 import pgoapi
 import api
 
@@ -33,8 +29,8 @@ def create_mock_api_wrapper():
 
         return function()
 
-    def _set_request(type, response):
-        call_responses.append((type, response))
+    def _set_request(call_type, response):
+        call_responses.append((call_type, response))
 
     def _create_request():
         request = Mock()
@@ -54,7 +50,6 @@ def create_mock_api_wrapper():
     pgoapi_instance.set_position = _set_position
     pgoapi_instance.get_position = _get_position
     pgoapi_instance.list_curr_methods = MagicMock(return_value=[])
-    pgoapi_instance._auth_provider = MagicMock(return_value=None)  # ToDo: mock this not the api_wrapper method
     pgoapi_instance.create_request = _create_request
     pgoapi_instance.__getattr__ = _add_request
     pgoapi_instance.set_response = _set_request
@@ -85,12 +80,3 @@ def create_mock_bot(config=None):
     bot.stepper = Stepper(bot)
 
     return bot
-
-
-class StepperMock(pokemongo_bot.Stepper):
-    def __init__(self, bot):
-        self.bot = bot
-        self.bot.config
-        self.current_lat = 0
-        self.current_lng = 0
-        self.current_alt = 0
