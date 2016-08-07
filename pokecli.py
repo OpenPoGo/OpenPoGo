@@ -34,6 +34,7 @@ import argparse
 import ssl
 import logging
 import sys
+import platform
 
 from pokemongo_bot import logger
 from pokemongo_bot import PokemonGoBot
@@ -81,9 +82,29 @@ def init_config():
         },
         "location_cache": False,
         "initial_transfer": False,
+        "navigator": "fort",
+        "navigator_waypoints": [],
+        "navigator_campsite": None,
+        "path_finder": "google",
+
+        # incubation settings
+        "incubation_fill": False,
+        "incubation_use_all": False,
+        "incubation_priority": ["10km", "5km", "2km"],
+        "incubation_restrict": {
+            "2km": 901
+        },
+
         "debug": False,
         "test": False
     }
+
+    if platform.system() == "Windows":
+        default_config["load_library"] = "encrypt.dll"
+    elif platform.system() == "Linux":
+        default_config["load_library"] = "libencrypt.so"
+    elif platform.system() == "Darwin":
+        default_config["load_library"] = "libencrypt-darwin.so"
 
     parser = argparse.ArgumentParser()
 
@@ -110,17 +131,36 @@ def init_config():
         dest="location_cache",
         default=None)
     parser.add_argument(
-        "-m",
-        "--mode",
-        help="Set farming Mode for the bot ('all', 'poke', 'farm')",
-        type=str,
-        dest="mode")
-    parser.add_argument(
         "-w",
         "--walk",
         help="Walk instead of teleport with given speed (meters per second max 4.16 because of walking end on 15km/h)",
         type=float,
         dest="walk")
+    parser.add_argument(
+        "-n",
+        "--navigator",
+        help="Navigator to use to create a destination. <fort|waypoint|campsite> (default fort)",
+        type=str,
+        dest="navigator")
+    parser.add_argument(
+        "-pf",
+        "--path-finder",
+        help="Path Finder to use to find a path to a point. <google|direct> (default google)",
+        type=str,
+        dest="path_finder")
+    parser.add_argument(
+        "-wp",
+        "--waypoint",
+        help="Waypoint to visit in coordinates. Only valid if navigator is waypoint",
+        type=str,
+        dest="navigator_waypoint",
+        nargs='*')
+    parser.add_argument(
+        "-camp",
+        "--campsite",
+        help="Waypoint to visit in coordinates. Only valid if navigator is campsite",
+        type=str,
+        dest="navigator_campsite")
     parser.add_argument(
         "-du",
         "--distance-unit",
@@ -202,20 +242,37 @@ def init_config():
         dest="exclude_plugins")
 
     parser.add_argument(
-        "-fi",
-        "--fill-incubators",
+        "-if",
+        "--incubation-fill",
         help="Fill incubators with eggs",
         action="store_true",
-        dest="fill_incubators",
+        dest="incubation_fill",
         default=None)
-
     parser.add_argument(
-        "-ai",
-        "--use-all-incubators",
+        "-ia",
+        "--incubation-use-all",
         help="Use all incubators or only unlimited one",
         action="store_true",
-        dest="use_all_incubators",
+        dest="incubation_use_all",
         default=None)
+    parser.add_argument(
+        "-ip",
+        "--incubation-priority",
+        help="Priority of eggs to be incubated. Comma separated list of -ip=\"10km,5km,2km\"",
+        type=str,
+        dest="incubation_priority")
+    parser.add_argument(
+        "-ir",
+        "--incubation-restrict",
+        help="Restrict an egg to an incubator. List of <distance=incubator_id>. E.g. -ir=\"10km=901,5km=902\"",
+        type=str,
+        dest="incubation_restrict")
+    parser.add_argument(
+        "-lib",
+        "--load-library",
+        help="Specify which shared library to use to generate Signature fields in requests.",
+        type=str,
+        dest="load_library")
 
     config = parser.parse_args()
 
@@ -243,6 +300,17 @@ def init_config():
     for item_id in str_item_filter:
         int_item_filter[int(item_id)] = str_item_filter[item_id]
     config.item_filter = int_item_filter
+
+    if isinstance(config.incubation_priority, str):
+        config.incubation_priority = config.incubation_priority.split(',')
+
+    if isinstance(config.incubation_restrict, str):
+        incubation_restrict_dict = {}
+        for key_value in config.incubation_restrict.split(','):
+            distance, incubator_id = key_value.split('=')
+            incubation_restrict_dict[distance] = incubator_id
+
+        config.incubation_restrict = incubation_restrict_dict
 
     print(config.__dict__)
 
@@ -283,7 +351,7 @@ def main():
         logger.log('[x] Starting PokemonGo Bot....', 'green')
 
         while True:
-            bot.take_step()
+            bot.run()
 
     except KeyboardInterrupt:
         logger.log('[x] Exiting PokemonGo Bot', 'red')
