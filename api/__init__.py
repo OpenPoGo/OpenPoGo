@@ -9,7 +9,7 @@ from .state_manager import StateManager
 
 
 class PoGoApi(object):
-    def __init__(self, provider="google", username="", password=""):
+    def __init__(self, provider="google", username="", password="", shared_lib="encrypt.dll"):
         self._api = PGoApi()
 
         self.provider = provider
@@ -22,6 +22,8 @@ class PoGoApi(object):
 
         self._pending_calls = {}
         self._pending_calls_keys = []
+
+        self._api.activate_signature(shared_lib)
 
     def login(self):
         try:
@@ -99,10 +101,12 @@ class PoGoApi(object):
                 print("[API] Requesting too fast. Retrying in 10 seconds...")
                 time.sleep(10)
                 continue
+            """
             except TypeError:
                 print("[API] Failed to perform API call (servers might be offline). Retrying in 10 seconds...")
                 time.sleep(10)
                 continue
+            """
 
             if results is False or results is None or results.get('status_code', 1) != 1:
                 print("[API] API call failed. Retrying in 10 seconds...")
