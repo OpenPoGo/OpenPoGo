@@ -34,3 +34,4 @@ release_config.json
 encrypt.dll
 libencrypt.so
 libencrypt_darwin.so
+encrypt.c
