@@ -23,7 +23,7 @@ def run_socket_server():
     socketio = SocketIO(app, logging=False, engineio_logger=False, json=myjson)
 
     state = {}
-    
+
     botevents.register_bot_events(socketio, state)
     uievents.register_ui_events(socketio, state)
 
