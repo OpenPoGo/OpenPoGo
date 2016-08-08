@@ -10,6 +10,7 @@ gpsoauth==0.3.0
 greenlet==0.4.10
 itsdangerous==0.24
 Jinja2==2.8
+jsonpickle==0.9.3
 MarkupSafe==0.23
 -e git+https://github.com/keyphact/pgoapi.git@06eaef1e0353d17f775f2d1765d6281a05be7654#egg=pgoapi-dev
 protobuf==3.0.0b4
