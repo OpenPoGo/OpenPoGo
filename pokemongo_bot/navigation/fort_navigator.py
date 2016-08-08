@@ -31,7 +31,10 @@ class FortNavigator(Navigator):
                 else:
                     fort_name = response_dict["fort"].fort_name
 
-                yield Destination(fort.latitude, fort.longitude, 0.0, name="PokeStop \"{}\"".format(fort_name.decode()))
+                if isinstance(fort_name, bytes):
+                    fort_name = fort_name.decode()
+
+                yield Destination(fort.latitude, fort.longitude, 0.0, name="PokeStop \"{}\"".format(fort_name))
 
                 self.api_wrapper.player_update(latitude=fort.latitude, longitude=fort.longitude)
                 sleep(2)
