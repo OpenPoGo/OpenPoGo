@@ -37,12 +37,8 @@ def run_flask():
 
         state["username"] = emitted_object["username"]
         state["coordinates"] = emitted_object["coordinates"]
-        socketio.emit("bot_initialized", [emitted_object], namespace="/event")
 
-    @manager.on("logging")
-    def logging_event(text="", color="black"):
-        line = {"output": text, "color": color}
-        socketio.emit("logging", [line], namespace="/event")
+        socketio.emit("bot_initialized", [emitted_object], namespace="/event")
 
     @manager.on("position_updated")
     def position_update(bot, coordinates=None):
@@ -88,29 +84,6 @@ def run_flask():
         cached_events["player"] = emitted_object
         socketio.emit("player", emitted_object, namespace="/event")
 
-    @manager.on("inventory_update", priority=-2000)
-    def inventory_updated_event(bot, inventory=None):
-        # type: (PokemonGoBot, Dict[int, int]) -> None
-        if inventory is None or inventory.get("count", 0) == 0:
-            return
-        emitted_object = {
-            "inventory": inventory,
-            "username": bot.get_username()
-        }
-        cached_events["inventory"] = emitted_object
-        socketio.emit("inventory", emitted_object, namespace="/event")
-
-    @manager.on("pokemon_found", priority=-2000)
-    def pokemon_found_event(bot=None, encounters=None):
-        if encounters is None or len(encounters) == 0:
-            return
-        emitted_object = {
-            "nearby_pokemon": JSONEncodable.encode_list(encounters),
-            "username": bot.get_username()
-        }
-        cached_events["nearby_pokemon"] = emitted_object
-        socketio.emit("nearby_pokemon", emitted_object, namespace="/event")
-
     @manager.on("pokemon_caught")
     def pokemon_caught(bot=None, pokemon=None):
         if pokemon is None:
@@ -141,8 +114,6 @@ def run_flask():
         bot = state["bot"]
         bot.api_wrapper.get_player().get_inventory()
         inventory = bot.api_wrapper.call()
-
-        print inventory.keys()
 
         emit_object = {
             "pokemon": inventory["pokemon"],
