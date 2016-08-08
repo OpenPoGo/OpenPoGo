@@ -30,6 +30,7 @@ def run_flask():
 
     @manager.on("bot_initialized")
     def bot_initialized(bot):
+        # pylint: disable=global-statement
         global google_maps_api_key
         if google_maps_api_key is None or len(google_maps_api_key) == 0:
             google_maps_api_key = bot.config.gmapkey

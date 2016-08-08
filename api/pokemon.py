@@ -36,4 +36,3 @@ class Pokemon(JSONEncodable):
         self.weight = data.get("weight_kg", 0.0)
 
         self.deployed_fort_id = data.get("deployed_fort_id", None)
-
