@@ -65,8 +65,8 @@ def register_ui_events(socketio, state):
     @socketio.on("evolve_pokemon", namespace="/event")
     def client_ask_for_evolve(evt):
         if "bot" in state:
-            print evt
-            print evt["id"]
+            # print evt
+            # print evt["id"]
             logger.log("Web UI action: Evolve", "yellow", fire_event=False)
             bot = state["bot"]
             # bot.pokemon_list
