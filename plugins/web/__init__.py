@@ -46,7 +46,6 @@ def run_flask():
     def index():
         if len(active_bots) == 0:
             return "No bots currently active."
-        global google_maps_api_key
         if google_maps_api_key is None or len(google_maps_api_key) == 0:
             return "No Google Maps API key provided."
         return render_template("index.html", google_maps_api_key=google_maps_api_key)
