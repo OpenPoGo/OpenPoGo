@@ -23,22 +23,29 @@ def run_flask():
     socketio = SocketIO(app, logging=False, engineio_logger=False, json=myjson)
 
     cached_events = {}
-    active_bots = {}
     state = {}
 
     @manager.on("bot_initialized")
     def bot_initialized(bot):
-        state["bot"] = bot
+        info = bot.update_player_and_inventory()
+        player = info["player"]
+        print info["player"]
 
         emitted_object = {
-            "username": bot.get_username(),
-            "coordinates": bot.get_position()
+            "username": player.username,
+            "level": player.level,
+            "coordinates": bot.get_position(),
+            "storage": {
+                "max_item_storage": player.max_item_storage,
+                "max_pokemon_storage": player.max_pokemon_storage
+            }
         }
 
-        state["username"] = emitted_object["username"]
-        state["coordinates"] = emitted_object["coordinates"]
+        # reinit state
+        state.update(emitted_object)
+        state["bot"] = bot
 
-        socketio.emit("bot_initialized", [emitted_object], namespace="/event")
+        socketio.emit("bot_initialized", emitted_object, namespace="/event")
 
     @manager.on("position_updated")
     def position_update(bot, coordinates=None):
@@ -59,7 +66,6 @@ def run_flask():
             "gyms": JSONEncodable.encode_list(gyms),
             "username": bot.get_username()
         }
-        cached_events["gyms"] = emitted_object
         socketio.emit("gyms", emitted_object, namespace="/event")
 
     @manager.on("pokestops_found", priority=-2000)
@@ -70,19 +76,7 @@ def run_flask():
             "pokestops": JSONEncodable.encode_list(pokestops),
             "username": bot.get_username()
         }
-        cached_events["pokestops"] = emitted_object
         socketio.emit("pokestops", emitted_object, namespace="/event")
-
-    @manager.on("player_update", priority=-2000)
-    def player_updated_event(bot=None, player=None):
-        if player is None:
-            return
-        emitted_object = {
-            "player": player.to_json_encodable(),
-            "username": bot.get_username()
-        }
-        cached_events["player"] = emitted_object
-        socketio.emit("player", emitted_object, namespace="/event")
 
     @manager.on("pokemon_caught")
     def pokemon_caught(bot=None, pokemon=None):
