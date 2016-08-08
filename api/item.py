@@ -20,6 +20,6 @@ class Incubator(JSONEncodable):
         return state
 
     def __setstate__(self, state):
-        state["unique_id"] = long(state["unique_id"])
-        state["pokemon_id"] = long(state["pokemon_id"])
+        state["unique_id"] = int(state["unique_id"])
+        state["pokemon_id"] = int(state["pokemon_id"])
         self.__dict__.update(state)

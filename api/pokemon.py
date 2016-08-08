@@ -19,7 +19,7 @@ class Egg(JSONEncodable):
         return state
 
     def __setstate__(self, state):
-        state["unique_id"] = long(state["unique_id"])
+        state["unique_id"] = int(state["unique_id"])
         self.__dict__.update(state)
 
 class Pokemon(JSONEncodable):
@@ -55,5 +55,5 @@ class Pokemon(JSONEncodable):
         return state
 
     def __setstate__(self, state):
-        state["unique_id"] = long(state["unique_id"])
+        state["unique_id"] = int(state["unique_id"])
         self.__dict__.update(state)
