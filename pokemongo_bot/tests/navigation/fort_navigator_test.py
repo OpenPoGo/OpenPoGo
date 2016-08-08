@@ -1,5 +1,7 @@
 import unittest
 
+from mock import MagicMock
+
 from api.worldmap import Cell
 from pokemongo_bot import FortNavigator
 from pokemongo_bot.navigation.destination import Destination
@@ -45,10 +47,7 @@ class FortNavigatorTest(unittest.TestCase):
             "max_steps": 2
         })
         api_wrapper = bot.api_wrapper
-        pgoapi = api_wrapper._api  # pylint: disable=protected-access
-
-        pgoapi.set_response('fort_details', self._create_pokestop("Test Stop", 51.5043872, -0.0741802))
-        pgoapi.set_response('fort_details', {})
+        api_wrapper.call = MagicMock(return_value=None)
 
         navigator = FortNavigator(bot)
         map_cells = self._create_map_cells()
@@ -60,11 +59,11 @@ class FortNavigatorTest(unittest.TestCase):
             if len(destinations) == 0:
                 assert destination.target_lat == 51.5043872
                 assert destination.target_lng == -0.0741802
-                assert destination.name == "PokeStop \"Test Stop\""
+                assert destination.name == "PokeStop \"fort_unknown1\""
             elif len(destinations) == 1:
                 assert destination.target_lat == 51.5060435
                 assert destination.target_lng == -0.073983
-                assert destination.name == "PokeStop \"Unknown\""
+                assert destination.name == "PokeStop \"fort_unknown2\""
 
             destinations.append(destination)
 
@@ -81,8 +80,8 @@ class FortNavigatorTest(unittest.TestCase):
                     }
                 ],
                 "forts": [
-                    self._create_pokestop(1, 51.5043872, -0.0741802),
-                    self._create_pokestop(2, 51.5060435, -0.073983),
+                    self._create_pokestop("unknown1", 51.5043872, -0.0741802),
+                    self._create_pokestop("unknown2", 51.5060435, -0.073983),
                 ]
             })
         ]
@@ -90,7 +89,7 @@ class FortNavigatorTest(unittest.TestCase):
     @staticmethod
     def _create_pokestop(name, lat, lng):
         return {
-            "fort_id": str(name),
+            "id": "fort_" + str(name),
             "name": str(name),
             "latitude": lat,
             "longitude": lng,

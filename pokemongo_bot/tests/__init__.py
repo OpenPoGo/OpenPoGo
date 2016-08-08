@@ -35,11 +35,15 @@ def create_mock_api_wrapper():
     def _create_request():
         request = Mock()
         call_type, call_response = call_responses.pop(0)
-        request.call = MagicMock(return_value={
-            "responses": {
-                call_type.upper(): call_response
-            }
-        })
+        if call_response is None:
+            request.call = MagicMock(return_value=None)
+        else:
+            request.call = MagicMock(return_value={
+                "responses": {
+                    call_type.upper(): call_response
+                }
+            })
+
         # print("creating request for {} ({})...".format(call_type, call_response))
         setattr(request, call_type, call_response)
 
@@ -60,20 +64,19 @@ def create_mock_api_wrapper():
     return api_wrapper
 
 
-def create_mock_bot(config=None):
-    if config is None:
-        config = {
-            "debug": False,
-        }
-    if "path_finder" not in config:
-        config["path_finder"] = None
-    if "walk" not in config:
-        config["walk"] = 5
-    if "max_steps" not in config:
-        config["max_steps"] = 2
+def create_mock_bot(user_config=None):
+    if user_config is None:
+        user_config = {}
+
+    config = {
+        "debug": False,
+        "path_finder": None,
+        "walk": 4.16,
+        "max_steps": 2,
+    }
+    config.update(user_config)
 
     config_namespace = Namespace(**config)
-    config_namespace.debug = False
 
     bot = pokemongo_bot.PokemonGoBot(config_namespace)
     bot.api_wrapper = create_mock_api_wrapper()

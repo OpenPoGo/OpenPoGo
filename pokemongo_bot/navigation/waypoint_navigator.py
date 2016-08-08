@@ -41,5 +41,5 @@ class WaypointNavigator(Navigator):
         # type: (float, float) -> None
         try:
             self.waypoints[index] = None
-        except KeyError:
+        except IndexError:
             pass

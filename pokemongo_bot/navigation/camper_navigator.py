@@ -11,7 +11,7 @@ class CamperNavigator(Navigator):
         super(CamperNavigator, self).__init__(bot)
 
         if bot.config.navigator_campsite is None:
-            self.camping_sites = [bot.position[0], bot.position[1]]
+            self.camping_sites = [(bot.position[0], bot.position[1])]
         else:
             lat, lng = bot.config.navigator_campsite.split(',')
             self.camping_sites = [(float(lat), float(lng))]
@@ -30,7 +30,7 @@ class CamperNavigator(Navigator):
 
             sleep(5)
 
-        except KeyError:
+        except IndexError:
             logger.log("[#] No campsite location found", color="red")
 
     @manager.on("set_campsite", priority=0)

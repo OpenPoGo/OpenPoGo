@@ -65,7 +65,7 @@ class WaypointNavigatorTest(unittest.TestCase):
                 assert destination.target_lat == 51.5060435
                 assert destination.target_lng == -0.073983
                 assert destination.name == "Waypoint at 51.5060435,-0.073983"
-            elif len(destinations) == 1:
+            elif len(destinations) == 2:
                 assert destination.target_lat == 51.5087667
                 assert destination.target_lng == -0.0732307
                 assert destination.name == "Waypoint at 51.5087667,-0.0732307"
@@ -100,7 +100,7 @@ class WaypointNavigatorTest(unittest.TestCase):
                 assert destination.target_lat == 51.5060435
                 assert destination.target_lng == -0.073983
                 assert destination.name == "Waypoint at 51.5060435,-0.073983"
-            elif len(destinations) == 1:
+            elif len(destinations) == 2:
                 assert destination.target_lat == 51.5087667
                 assert destination.target_lng == -0.0732307
                 assert destination.name == "Waypoint at 51.5087667,-0.0732307"
@@ -159,18 +159,9 @@ class WaypointNavigatorTest(unittest.TestCase):
         for destination in navigator.navigate(map_cells):
             assert isinstance(destination, Destination)
 
-            if len(destinations) == 0:
-                assert destination.target_lat == 51.5043872
-                assert destination.target_lng == -0.0741802
-                assert destination.name == "Waypoint at 51.5043872,-0.0741802"
-            elif len(destinations) == 1:
-                assert destination.target_lat == 51.5060435
-                assert destination.target_lng == -0.073983
-                assert destination.name == "Waypoint at 51.5060435,-0.073983"
-            elif len(destinations) == 1:
-                assert destination.target_lat == 51.5087667
-                assert destination.target_lng == -0.0732307
-                assert destination.name == "Waypoint at 51.5087667,-0.0732307"
+            assert destination.target_lat == 51.5043872
+            assert destination.target_lng == -0.0741802
+            assert destination.name == "Waypoint at 51.5043872,-0.0741802"
 
             # Inject a new waypoint after first visit
             if waypoint_remove is True:
@@ -180,6 +171,21 @@ class WaypointNavigatorTest(unittest.TestCase):
             destinations.append(destination)
 
         assert len(destinations) == 1
+
+    @staticmethod
+    def test_navigate_waypoint_remove_not_exists():
+        bot = create_mock_bot({
+            "walk": 5,
+            "max_steps": 2,
+            "navigator_waypoints": [
+                [51.5043872, -0.0741802],
+                [51.5060435, -0.073983]
+            ]
+        })
+
+        navigator = WaypointNavigator(bot)
+
+        navigator.waypoint_remove(100)
 
     def _create_map_cells(self):
         return [

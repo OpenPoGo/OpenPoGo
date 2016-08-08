@@ -30,6 +30,45 @@ class CamperNavigatorTest(unittest.TestCase):
 
         assert len(destinations) == 1
 
+    def test_navigate_campsite_last_position(self):
+        bot = create_mock_bot({
+            "walk": 5,
+            "max_steps": 2,
+            "navigator_campsite": None
+        })
+
+        navigator = CamperNavigator(bot)
+        map_cells = self._create_map_cells()
+
+        destinations = list()
+        for destination in navigator.navigate(map_cells):
+            assert isinstance(destination, Destination)
+
+            assert destination.target_lat == 0
+            assert destination.target_lng == 0
+            assert destination.name == "Camping position at 0,0"
+
+            destinations.append(destination)
+
+        assert len(destinations) == 1
+
+    def test_navigate_campsite_invalid_index(self):
+        bot = create_mock_bot({
+            "walk": 5,
+            "max_steps": 2,
+            "navigator_campsite": "{},{}".format(51.5043872, -0.0741802)
+        })
+
+        navigator = CamperNavigator(bot)
+        navigator.pointer = 100
+        map_cells = self._create_map_cells()
+
+        destinations = list()
+        for _ in navigator.navigate(map_cells):
+            pass
+
+        assert len(destinations) == 0
+
     def test_navigate_campsite_add_before_start(self):
         bot = create_mock_bot({
             "walk": 5,
