@@ -1,7 +1,7 @@
 from threading import Thread
 import os
 import logging
-from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask import Flask, request
 from flask_socketio import SocketIO, emit
 
 from pokemongo_bot import logger
@@ -16,10 +16,9 @@ logging.getLogger('socketio').disabled = True
 logging.getLogger('engineio').disabled = True
 logging.getLogger('werkzeug').disabled = True
 
-def run_flask():
+def run_socket_server():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = "OpenPoGoBotSocket"
-    
     socketio = SocketIO(app, logging=False, engineio_logger=False, json=myjson)
 
     cached_events = {}
@@ -29,8 +28,6 @@ def run_flask():
     def bot_initialized(bot):
         info = bot.update_player_and_inventory()
         player = info["player"]
-        print info["player"]
-
         emitted_object = {
             "username": player.username,
             "level": player.level,
@@ -40,6 +37,9 @@ def run_flask():
                 "max_pokemon_storage": player.max_pokemon_storage
             }
         }
+
+        # templates = bot.api_wrapper.download_item_templates().call()
+        # print templates
 
         # reinit state
         state.update(emitted_object)
@@ -52,8 +52,7 @@ def run_flask():
         if coordinates is None:
             return
         emitted_object = {
-            "coordinates": coordinates,
-            "username": bot.get_username()
+            "coordinates": coordinates
         }
         state["coordinates"] = coordinates
         socketio.emit("position", emitted_object, namespace="/event")
@@ -63,8 +62,7 @@ def run_flask():
         if gyms is None or len(gyms) == 0:
             return
         emitted_object = {
-            "gyms": JSONEncodable.encode_list(gyms),
-            "username": bot.get_username()
+            "gyms": JSONEncodable.encode_list(gyms)
         }
         socketio.emit("gyms", emitted_object, namespace="/event")
 
@@ -73,29 +71,43 @@ def run_flask():
         if pokestops is None or len(pokestops) == 0:
             return
         emitted_object = {
-            "pokestops": JSONEncodable.encode_list(pokestops),
-            "username": bot.get_username()
+            "pokestops": JSONEncodable.encode_list(pokestops)
         }
         socketio.emit("pokestops", emitted_object, namespace="/event")
+
+    @manager.on("pokestop_visited", priority=-2000)
+    def pokestop_visited_event(bot=None, pokestop=None):
+        if pokestop is None:
+            return
+        emitted_object = {
+            "pokestop": pokestop
+        }
+        socketio.emit("pokestop_visited", emitted_object, namespace="/event")
 
     @manager.on("pokemon_caught")
     def pokemon_caught(bot=None, pokemon=None):
         if pokemon is None:
             return
         emitted_object = {
-            "pokemon": pokemon.to_json(),
-            "username": bot.get_username()
+            "pokemon": pokemon.to_json()
         }
         socketio.emit("pokemon_caught", emitted_object, namespace="/event")
+
+    @manager.on("transfer_pokemon")
+    def transfer_pokemon(bot=None, pokemon=None):
+        if pokemon is None:
+            return
+        emitted_object = {
+            "pokemon": pokemon.to_json()
+        }
+        socketio.emit("transfer_pokemon", emitted_object, namespace="/event")
 
     @socketio.on("connect", namespace="/event")
     def connect():
         logger.log("Web client connected", "yellow", fire_event=False)
         if "username" in state:
-            emitted_object = {
-                "username": state["username"],
-                "coordinates": state["coordinates"]
-            }
+            emitted_object = state.copy()
+            del emitted_object["bot"]
             socketio.emit("bot_initialized", emitted_object, namespace="/event")
 
     @socketio.on("disconnect", namespace="/event")
@@ -141,9 +153,14 @@ def run_flask():
         }
         socketio.emit("eggs_list", emit_object, namespace="/event", room=request.sid)
 
+    @socketio.on("evolve_pokemon", namespace="/event")
+    def client_ask_for_evolve(evt):
+        print evt.id
+        logger.log("Web UI action: Evolve", "yellow", fire_event=False)
+        bot = state["bot"]
+
     socketio.run(app, host="0.0.0.0", port=8000, debug=False, use_reloader=False, log_output=False)
 
-
-WEB_THREAD = Thread(target=run_flask)
+WEB_THREAD = Thread(target=run_socket_server)
 WEB_THREAD.daemon = True
 WEB_THREAD.start()
