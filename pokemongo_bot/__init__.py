@@ -116,8 +116,8 @@ class PokemonGoBot(object):
                     self.mapper.get_cells_at_current_position()
                 )
 
-            position_lat = destination.target_lat
-            position_lng = destination.target_lng
+            position_lat = self.stepper.current_lat
+            position_lng = self.stepper.current_lng
 
     def work_on_cells(self, map_cells):
         # type: (Cell, bool) -> None
@@ -175,6 +175,7 @@ class PokemonGoBot(object):
             inventory = response_dict['inventory']
             self.candies = response_dict['candy']
             pokemon = response_dict['pokemon']
+            eggs = response_dict['eggs']
             creation_date = player.get_creation_date()
 
             balls_stock = self.pokeball_inventory()
@@ -186,7 +187,7 @@ class PokemonGoBot(object):
             logger.log('[#] Username: {}'.format(player.username))
             logger.log('[#] Acccount creation: {}'.format(creation_date))
             logger.log('[#] Bag storage: {}/{}'.format(inventory["count"], player.max_item_storage))
-            logger.log('[#] Pokemon storage: {}/{}'.format(len(pokemon), player.max_pokemon_storage))
+            logger.log('[#] Pokemon storage: {}/{}'.format(len(pokemon) + len(eggs), player.max_pokemon_storage))
             logger.log('[#] Stardust: {}'.format(stardust))
             logger.log('[#] Pokecoins: {}'.format(pokecoins))
             logger.log('[#] Poke Balls: {}'.format(balls_stock[1]))
