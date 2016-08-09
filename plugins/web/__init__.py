@@ -130,6 +130,11 @@ def run_flask():
         cached_events["inventory"] = emitted_object
         socketio.emit("inventory", emitted_object, namespace="/event")
 
+    @socketio.on("user_action", namespace="/event")
+    def handle_user_action(json):
+        if 'event' in json and 'payload' in json:
+            manager.fire('web_' + str(json["event"]), payload=json['data'])
+
     @manager.on("pokemon_found", priority=-2000)
     def pokemon_found_event(bot=None, encounters=None):
         if encounters is None or len(encounters) == 0:

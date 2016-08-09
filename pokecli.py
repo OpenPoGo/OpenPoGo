@@ -99,7 +99,8 @@ def init_config():
         },
 
         "debug": False,
-        "test": False
+        "test": False,
+        "web_events": False
     }
 
     if platform.system() == "Windows":
@@ -284,6 +285,14 @@ def init_config():
         help="Specify which shared library to use to generate Signature fields in requests.",
         type=str,
         dest="load_library")
+
+    parser.add_argument(
+        "-we",
+        "--web-event",
+        nargs="*",
+        help="Pass a web event to listen for from the web client (can be used multiple times). Requires the web and logger modules.",
+        type=str,
+        dest="web_events")
 
     config = parser.parse_args()
 
