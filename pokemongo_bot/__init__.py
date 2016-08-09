@@ -116,8 +116,8 @@ class PokemonGoBot(object):
                     self.mapper.get_cells_at_current_position()
                 )
 
-            position_lat = destination.target_lat
-            position_lng = destination.target_lng
+            position_lat = self.stepper.current_lat
+            position_lng = self.stepper.current_lng
 
     def work_on_cells(self, map_cells):
         # type: (Cell, bool) -> None
