@@ -35,6 +35,7 @@ import ssl
 import logging
 import sys
 import platform
+import re
 
 from pokemongo_bot import logger
 from pokemongo_bot import PokemonGoBot
@@ -82,6 +83,8 @@ def init_config():
         },
         "location_cache": False,
         "initial_transfer": False,
+        "evolve_pokemon": False,
+        "evolve_filter":[],
         "navigator": "fort",
         "navigator_waypoints": [],
         "navigator_campsite": None,
@@ -242,6 +245,14 @@ def init_config():
         dest="exclude_plugins")
 
     parser.add_argument(
+        "-ev",
+        "--evolve-pokemon",
+        help="Bot will evolve pokemon whenever enough candies are acquired.",
+        dest="evolve_pokemon",
+        default=None
+    )
+
+    parser.add_argument(
         "-if",
         "--incubation-fill",
         help="Fill incubators with eggs",
@@ -293,7 +304,7 @@ def init_config():
         if config.__dict__.get(key) is None and default_config.get(key) is not None:
             config.__dict__[key] = default_config.get(key)
 
-    config.exclude_plugins = config.exclude_plugins.split(",")
+    config.exclude_plugins = re.split(r",\s*", config.exclude_plugins)
 
     str_item_filter = config.__dict__.get("item_filter", {})
     int_item_filter = {}

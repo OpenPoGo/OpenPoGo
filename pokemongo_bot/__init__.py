@@ -40,6 +40,8 @@ class PokemonGoBot(object):
 
         self.log = None
         self.api_wrapper = None
+        self.inventory = []
+        self.candies = {}
         self.ignores = []
         self.position = (0, 0, 0)
         self.plugin_manager = None
@@ -79,6 +81,17 @@ class PokemonGoBot(object):
             self.navigator = WaypointNavigator(self)  # pylint: disable=redefined-variable-type
         elif self.config.navigator == 'camper':
             self.navigator = CamperNavigator(self)  # pylint: disable=redefined-variable-type
+
+        self.fire('bot_initialized')
+
+        if self.config.initial_transfer:
+            self.fire("pokemon_bag_full")
+
+        if self.config.recycle_items:
+            self.fire("item_bag_full")
+
+        logger.log('[#]')
+        self.update_player_and_inventory()
 
     def fire(self, event, *args, **kwargs):
         # type: (str, *Any, **Any) -> None
@@ -160,6 +173,7 @@ class PokemonGoBot(object):
         if response_dict is not None:
             player = response_dict['player']
             inventory = response_dict['inventory']
+            self.candies = response_dict['candy']
             pokemon = response_dict['pokemon']
             creation_date = player.get_creation_date()
 
@@ -170,36 +184,46 @@ class PokemonGoBot(object):
 
             logger.log('[#]')
             logger.log('[#] Username: {}'.format(player.username))
-            logger.log('[#] Acccount Creation: {}'.format(creation_date))
-            logger.log('[#] Bag Storage: {}/{}'.format(inventory["count"], player.max_item_storage))
-            logger.log('[#] Pokemon Storage: {}/{}'.format(len(pokemon), player.max_pokemon_storage))
+            logger.log('[#] Acccount creation: {}'.format(creation_date))
+            logger.log('[#] Bag storage: {}/{}'.format(inventory["count"], player.max_item_storage))
+            logger.log('[#] Pokemon storage: {}/{}'.format(len(pokemon), player.max_pokemon_storage))
             logger.log('[#] Stardust: {}'.format(stardust))
             logger.log('[#] Pokecoins: {}'.format(pokecoins))
-            logger.log('[#] PokeBalls: {}'.format(balls_stock[1]))
-            logger.log('[#] GreatBalls: {}'.format(balls_stock[2]))
-            logger.log('[#] UltraBalls: {}'.format(balls_stock[3]))
+            logger.log('[#] Poke Balls: {}'.format(balls_stock[1]))
+            logger.log('[#] Great Balls: {}'.format(balls_stock[2]))
+            logger.log('[#] Ultra Balls: {}'.format(balls_stock[3]))
             logger.log('[#] -- Level: {}'.format(player.level))
             logger.log('[#] -- Experience: {}'.format(player.experience))
             logger.log('[#] -- Experience until next level: {}'.format(player.next_level_xp - player.experience))
-            logger.log('[#] -- Pokemon Captured: {}'.format(player.pokemons_captured))
-            logger.log('[#] -- Pokestops Visited: {}'.format(player.poke_stop_visits))
+            logger.log('[#] -- Pokemon captured: {}'.format(player.pokemons_captured))
+            logger.log('[#] -- Pokestops visited: {}'.format(player.poke_stop_visits))
         # Testing
         # self.drop_item(Item.ITEM_POTION.value,1)
         # exit(0)
-
-        if self.config.initial_transfer:
-            self.fire("pokemon_bag_full")
-
-        if self.config.recycle_items:
-            self.fire("item_bag_full")
-
-        logger.log('[#]')
-        self.update_player_and_inventory()
 
     def update_player_and_inventory(self):
         # type: () -> Dict[str, object]
         self.api_wrapper.get_player().get_inventory()
         return self.api_wrapper.call()
+
+    def add_candies(self, name=None, pokemon_candies=None):
+        for pokemon in self.pokemon_list:
+            if pokemon['Name'] is not name:
+                continue
+            else:
+                previous_evolutions = pokemon.get("Previous evolution(s)", [])
+                if previous_evolutions:
+                    candy_name = previous_evolutions[0]['Number']
+                else:
+                    candy_name = pokemon.get("Number")
+
+                if self.candies.get(candy_name, None) is not None:
+                    self.candies[candy_name] += pokemon_candies
+                else:
+                    self.candies[candy_name] = pokemon_candies
+                logger.log("[#] Added {} candies for {}".format(pokemon_candies,
+                                                                self.pokemon_list[int(candy_name) - 1]['Name']), 'green')
+                break
 
     def pokeball_inventory(self):
         balls_stock = {Item.ITEM_POKE_BALL.value: 0,
@@ -309,3 +333,13 @@ class PokemonGoBot(object):
         if response_dict is None:
             return 0
         return response_dict["inventory"]["count"]
+
+    def get_username(self):
+        # type: () -> str
+        response_dict = self.update_player_and_inventory()
+        if response_dict is None:
+            return "Unknown"
+        return response_dict["player"].username
+
+    def get_position(self):
+        return self.position

@@ -83,13 +83,15 @@ def pokemon_found(bot, encounters=None):
 
                 if pokeball == 0:
                     log("No ball selected as all balls are low in stock. Saving for better Pokemon.", color="red")
+                    bot.fire('no_balls')
                     return
 
                 log("Using {}... ({} left!)".format(bot.item_list[pokeball], balls_stock[pokeball]-1))
 
                 balls_stock[pokeball] -= 1
                 total_pokeballs -= 1
-                should_continue_throwing = throw_pokeball(bot, encounter_id, pokeball, spawn_point_id, pokemon)
+                pos = {"latitude": encounter_data.latitude, "longitude": encounter_data.longitude}
+                should_continue_throwing = throw_pokeball(bot, encounter_id, pokeball, spawn_point_id, pokemon, pos)
 
             time.sleep(5)
         elif status is 6:
@@ -99,7 +101,7 @@ def pokemon_found(bot, encounters=None):
             return
 
 
-def throw_pokeball(bot, encounter_id, pokeball, spawn_point_id, pokemon):
+def throw_pokeball(bot, encounter_id, pokeball, spawn_point_id, pokemon, pos):
     # type: (PokemonGoBot, int, int, str, Pokemon) -> bool
 
     def log(text, color="black"):
@@ -132,6 +134,7 @@ def throw_pokeball(bot, encounter_id, pokeball, spawn_point_id, pokemon):
         xp = pokemon_catch_response.xp
         stardust = pokemon_catch_response.stardust
         candy = pokemon_catch_response.candy
+        bot.add_candies(name=pokemon_name, pokemon_candies=candy)
         log("Rewards: {} XP, {} Stardust, {} Candy".format(xp, stardust, candy), "green")
-        bot.fire("pokemon_caught", pokemon=pokemon)
+        bot.fire("pokemon_caught", pokemon=pokemon, position=pos)
         return False

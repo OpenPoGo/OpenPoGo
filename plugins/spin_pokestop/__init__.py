@@ -41,7 +41,7 @@ def visit_near_pokestops(bot, pokestops=None):
         dist = distance(bot.stepper.current_lat, bot.stepper.current_lng, pokestop.latitude, pokestop.longitude)
 
         if dist < 15:
-            if pokestop.cooldown_timestamp_ms < now:
+            if pokestop.is_in_cooldown() is False:
                 manager.fire_with_context('pokestop_arrived', bot, pokestop=pokestop)
             elif bot.config.debug:
                 log("Nearby fort found is in cooldown for {} ({}m away)".format(format_time((pokestop.cooldown_timestamp_ms - now) / 1000),
@@ -89,6 +89,9 @@ def spin_pokestop(bot, pokestop=None):
     spin_result = spin_details.get("result")
     if spin_result == 1:
         log("Loot: ", "green")
+
+        manager.fire_with_context('pokestop_visited', bot, pokestop=pokestop)
+
         experience_awarded = spin_details.get("experience_awarded", False)
         if experience_awarded:
             log("+ {} XP".format(experience_awarded), "green")
