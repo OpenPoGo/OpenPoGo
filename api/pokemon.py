@@ -11,16 +11,6 @@ class Egg(JSONEncodable):
         self.captured_cell_id = data.get("captured_cell_id", 0)
         self.egg_incubator_id = data.get("egg_incubator_id", "")
 
-    # below function are for jsonpickle,
-    # because long field are not compatible with JSON and get rounded by browser
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        state["unique_id"] = str(self.unique_id)
-        return state
-
-    def __setstate__(self, state):
-        state["unique_id"] = int(state["unique_id"])
-        self.__dict__.update(state)
 
 class Pokemon(JSONEncodable):
 
@@ -46,14 +36,3 @@ class Pokemon(JSONEncodable):
         self.weight = data.get("weight_kg", 0.0)
 
         self.deployed_fort_id = data.get("deployed_fort_id", None)
-
-    # below function are for jsonpickle,
-    # because long field are not compatible with JSON and get rounded by browser
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        state["unique_id"] = str(self.unique_id)
-        return state
-
-    def __setstate__(self, state):
-        state["unique_id"] = int(state["unique_id"])
-        self.__dict__.update(state)
