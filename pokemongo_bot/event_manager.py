@@ -78,7 +78,7 @@ class Event(object):
 
     def print_event_pipeline(self):
         if self.num_listeners == 0:
-            self.log("Event pipeline for {} is empty.".format(self.name))
+            self.log("Event pipeline for \"{}\" is empty.".format(self.name))
         output = []
         priorities = sorted(self.listeners, key=lambda event_priority: event_priority)
         for priority in priorities:
@@ -87,8 +87,8 @@ class Event(object):
             func_names = [f.__name__ for f in self.listeners[priority]]
             output.append("{} ({})".format(priority, " -> ".join(func_names)))
         if len(output) == 0:
-            self.log("Event pipeline for {} is empty.".format(self.name))
-        self.log("Event pipeline for {}:".format(self.name), color="yellow")
+            self.log("Event pipeline for \"{}\" is empty.".format(self.name))
+        self.log("Event pipeline for \"{}\":".format(self.name), color="yellow")
         self.log(" -> ".join(output) + "\n", color="yellow")
 
 
