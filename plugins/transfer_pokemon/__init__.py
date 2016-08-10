@@ -1,3 +1,6 @@
+import json
+import os
+
 from api.pokemon import Pokemon
 from pokemongo_bot.human_behaviour import sleep
 from pokemongo_bot.event_manager import manager
@@ -6,6 +9,7 @@ from pokemongo_bot import logger
 
 @manager.on("pokemon_bag_full", "pokemon_caught", priority=-1000)
 def filter_pokemon(bot, transfer_list=None, pokemon=None):
+    global release_rules
     # type: (PokemonGoBot, Optional[List[Pokemon]], Pokemon) -> Dict[Str, List[Pokemon]]
 
     def log(text, color="black"):
@@ -31,17 +35,41 @@ def filter_pokemon(bot, transfer_list=None, pokemon=None):
 
     if bot.config.cp or bot.config.pokemon_potential:
         ignore_list = bot.config.ign_init_trans.split(',')
-        log(
-            "Transferring {} Pokemon with CP NOT above {} and IV NOT above {} and excluding {}.".format(
-                ("caught" if isinstance(pokemon, Pokemon) else "all"),
-                bot.config.cp,
-                bot.config.pokemon_potential,
-                ignore_list
+        if release_rules:
+            log(
+                "Transferring {} Pokemon according to rules and excluding [{}].".format(
+                    ("caught" if isinstance(pokemon, Pokemon) else "all"),
+                    ', '.join(ignore_list)
+                )
             )
-        )
+        else:
+            log(
+                "Transferring {} Pokemon with CP NOT above {} and IV NOT above {} and excluding [{}].".format(
+                    ("caught" if isinstance(pokemon, Pokemon) else "all"),
+                    bot.config.cp,
+                    bot.config.pokemon_potential,
+                    ', '.join(ignore_list)
+                )
+            )
 
         groups = list(indexed_pokemon.keys())
         for group in groups:
+            # Load rules for this group.
+            pokemon_name = bot.pokemon_list[group - 1]["Name"]
+            try:
+                pokemon_rules = release_rules[pokemon_name]
+                if 'release_below_cp' not in pokemon_rules:
+                    pokemon_rules['release_below_cp'] = bot.config.cp
+                if 'release_below_iv' not in pokemon_rules:
+                    pokemon_rules['release_below_iv'] = bot.config.pokemon_potential
+                if 'logic' not in pokemon_rules:
+                    pokemon_rules['logic'] = 'and'
+            except KeyError:
+                pokemon_rules = {
+                    'release_below_cp': bot.config.cp,
+                    'release_below_iv': bot.config.pokemon_potential,
+                    'logic': 'and',
+                }
 
             # If we've been given a caught pokemon, only process that group
             if isinstance(pokemon, Pokemon) and group != pokemon.pokemon_id:
@@ -55,15 +83,20 @@ def filter_pokemon(bot, transfer_list=None, pokemon=None):
                 # only keep everything below specified CP
                 group_transfer_list = []
                 for deck_pokemon in indexed_pokemon[group]:
-                    within_cp = (bot.config.cp == 0 or deck_pokemon.combat_power >= bot.config.cp)
-                    within_potential = (bot.config.pokemon_potential == 0 or deck_pokemon.potential >= bot.config.pokemon_potential)
-                    if not within_cp and not within_potential:
-                        group_transfer_list.append(deck_pokemon)
+                    within_cp = (deck_pokemon.combat_power > pokemon_rules['release_below_cp'])
+                    within_potential = (deck_pokemon.potential >= pokemon_rules['release_below_iv'])
+                    if pokemon_rules['logic'] == 'and':
+                        if within_cp and within_potential:
+                            continue
+                    elif pokemon_rules['logic'] == 'or':
+                        if within_cp or within_potential:
+                            continue
+                    group_transfer_list.append(deck_pokemon)
 
                 # Check if we are trying to remove all the pokemon in this group.
                 if len(group_transfer_list) == len(indexed_pokemon[group]):
-                    # Sort by CP and keep the best one
-                    indexed_pokemon[group].sort(key=lambda current_pokemon: current_pokemon.combat_power)
+                    # Sort by CP * potential and keep the best one
+                    indexed_pokemon[group].sort(key=lambda p: p.combat_power * p.potential)
                     indexed_pokemon[group] = indexed_pokemon[group][:-1]
                 else:
                     indexed_pokemon[group] = group_transfer_list
@@ -115,3 +148,9 @@ def transfer_pokemon(bot, transfer_list=None):
         bot.fire('after_transfer_pokemon', pokemon=pokemon)
 
     log("Transferred {} Pokemon.".format(len(transfer_list)))
+
+try:
+    with open(os.path.join('config', 'plugins', 'transfer_pokemon.json'), 'r') as f:
+        release_rules = json.load(f)
+except IOError:
+    release_rules = dict()

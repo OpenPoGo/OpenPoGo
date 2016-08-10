@@ -179,7 +179,7 @@ class StepperTest(unittest.TestCase):
         bot.fire = Mock(return_value=None)
         bot.heartbeat = Mock(return_value=None)
 
-        destination = Destination(51.50436, -0.07616, 11, name="Test Destination", exact_location=False)
+        destination = Destination(51.50436, -0.07916, 11, name="Test Destination", exact_location=False)
         steps = [
             (51.50442, -0.07612, 10),
             (51.50448, -0.07609, 11),
@@ -192,7 +192,7 @@ class StepperTest(unittest.TestCase):
 
         pgo = bot.api_wrapper._api  # pylint: disable=protected-access
 
-        calls.append(call("walking_started", coords=(51.50436, -0.07616, 11)))
+        calls.append(call("walking_started", coords=(51.50436, -0.07916, 11)))
         # pre-calculated distance is 17.8 meters
         pointer = 0
         for step in stepper.step(destination):
@@ -210,7 +210,7 @@ class StepperTest(unittest.TestCase):
 
             pointer += 1
 
-        calls.append(call("walking_finished", coords=(51.50436, -0.07616, 11)))
+        calls.append(call("walking_finished", coords=(51.50436, -0.07916, 11)))
 
         assert bot.fire.call_count == 5
         bot.fire.assert_has_calls(calls, any_order=False)
