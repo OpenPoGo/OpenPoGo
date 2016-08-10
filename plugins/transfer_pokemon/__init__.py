@@ -1,15 +1,12 @@
-import json
-import os
-
 from api.pokemon import Pokemon
 from pokemongo_bot.human_behaviour import sleep
 from pokemongo_bot.event_manager import manager
 from pokemongo_bot import logger
+from plugins.transfer_pokemon.config import release_rules
 
 
-@manager.on("pokemon_bag_full", "pokemon_caught", priority=-1000)
+@manager.on("pokemon_bag_full", "pokemon_caught", priority=1000)
 def filter_pokemon(bot, transfer_list=None, pokemon=None):
-    global release_rules
     # type: (PokemonGoBot, Optional[List[Pokemon]], Pokemon) -> Dict[Str, List[Pokemon]]
 
     def log(text, color="black"):
@@ -149,8 +146,3 @@ def transfer_pokemon(bot, transfer_list=None):
 
     log("Transferred {} Pokemon.".format(len(transfer_list)))
 
-try:
-    with open(os.path.join('config', 'plugins', 'transfer_pokemon.json'), 'r') as f:
-        release_rules = json.load(f)
-except IOError:
-    release_rules = dict()
