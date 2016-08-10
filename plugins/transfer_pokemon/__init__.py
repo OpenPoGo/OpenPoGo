@@ -82,12 +82,10 @@ def filter_pokemon(bot, transfer_list=None, pokemon=None):
                 for deck_pokemon in indexed_pokemon[group]:
                     within_cp = (deck_pokemon.combat_power > pokemon_rules['release_below_cp'])
                     within_potential = (deck_pokemon.potential >= pokemon_rules['release_below_iv'])
-                    if pokemon_rules['logic'] == 'and':
-                        if within_cp and within_potential:
-                            continue
-                    elif pokemon_rules['logic'] == 'or':
-                        if within_cp or within_potential:
-                            continue
+                    if pokemon_rules['logic'] == 'and' and (within_cp and within_potential):
+                        continue
+                    elif pokemon_rules['logic'] == 'or' and (within_cp or within_potential):
+                        continue
                     group_transfer_list.append(deck_pokemon)
 
                 # Check if we are trying to remove all the pokemon in this group.
@@ -145,4 +143,3 @@ def transfer_pokemon(bot, transfer_list=None):
         bot.fire('after_transfer_pokemon', pokemon=pokemon)
 
     log("Transferred {} Pokemon.".format(len(transfer_list)))
-
