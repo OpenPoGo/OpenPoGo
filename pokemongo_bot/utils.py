@@ -117,4 +117,3 @@ def format_time(seconds):
         minutes = seconds / 60
         return '{:.2f} minutes'.format(minutes)
     return '{:.2f} seconds'.format(seconds)
-
