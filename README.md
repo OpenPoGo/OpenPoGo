@@ -1,5 +1,7 @@
 # OpenPoGoBot
 [![Build Status](https://travis-ci.org/OpenPoGo/OpenPoGoBot.svg?branch=master)](https://travis-ci.org/OpenPoGo/OpenPoGoBot)
+[![Build status](https://ci.appveyor.com/api/projects/status/2w4vvuyto0cos54r/branch/master?svg=true)](https://ci.appveyor.com/project/wchill/openpogobot/branch/master)
+[![codecov](https://codecov.io/gh/OpenPoGo/OpenPoGoBot/branch/master/graph/badge.svg)](https://codecov.io/gh/OpenPoGo/OpenPoGoBot)
 
   A quick note:
   
@@ -31,7 +33,7 @@ See [CONTRIBUTING.md](https://github.com/OpenPoGo/OpenPoGoBot/blob/master/CONTRI
  * Use superior ball types when necessary
  * When out of normal pokeballs, use the next type of ball unless there are less than 10 of that type, in which case start automatically farming pokestops
  * Bot Navigation via Google Directions API
-* Incubate eggs
+ * Incubate eggs
 
 ## Installation
 
@@ -106,6 +108,7 @@ $ python pokecli.py [flags]
 | `--google-directions`           | `-gd`                | Use directions from the Google Maps API to navigate                                                                                                                                         |
 | `--debug`                       | `-d`                 | Enable Debug Mode                                                                                                                                                                           |
 | `--test`                        | `-t`                 | Only parse the specified location                                                                                                                                                           |
+| `--print-events`                | `-pe`                | Print event pipelines                                                                                                                                                                       |
 | `--incubation-fill`             | `-if`                | Fill incubators with eggs                                                                                                                                                                   |
 | `--incubation-use-all`          | `-ia`                | Use all incubators (instead of only the unlimited one)                                                                                                                                      |
 | `--incubation-priority`         | `-ip`                | Priority of eggs to be incubated. Comma separated list of `-ip='10km,5km,2km'`                                                                                                              |
