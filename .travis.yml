@@ -3,27 +3,26 @@ cache:
   directories:
     - $HOME/Library/Caches/pip
 
-env:
-  - PROTOBUF="3.0.0"
-
 matrix:
   include:
     - os: linux
       sudo: false
       language: python
       python: 2.7
+      env: PROTOBUF="3.0.0"
     - os: linux
       sudo: false
       language: python
       python: 3.5
+      env: PROTOBUF="3.0.0"
     - os: osx
       osx_image: xcode7.3
       language: generic
-      env: PYTHON="2.7"
+      env: PYTHON="2.7", PROTOBUF="3.0.0"
     - os: osx
       osx_image: xcode7.3
       language: generic
-      env: PYTHON="3.5"
+      env: PYTHON="3.5", PROTOBUF="3.0.0"
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" && "$PYTHON" == "2.7" ]]; then brew install python; fi
