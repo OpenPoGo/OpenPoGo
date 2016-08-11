@@ -8,6 +8,11 @@ from plugins.transfer_pokemon.config import release_rules
 @manager.on("pokemon_bag_full", "pokemon_caught", priority=1000)
 def filter_pokemon(bot, transfer_list=None, pokemon=None):
     # type: (PokemonGoBot, Optional[List[Pokemon]], Pokemon) -> Dict[Str, List[Pokemon]]
+    default_rules = {
+        'release_below_cp': bot.config.cp,
+        'release_below_iv': bot.config.pokemon_potential,
+        'logic': 'and',
+    }
 
     def log(text, color="black"):
         logger.log(text, color=color, prefix="Transfer")
@@ -51,22 +56,12 @@ def filter_pokemon(bot, transfer_list=None, pokemon=None):
 
         groups = list(indexed_pokemon.keys())
         for group in groups:
-            # Load rules for this group.
+            # Load rules for this group. If rule doesnt exist make one with default settings.
             pokemon_name = bot.pokemon_list[group - 1]["Name"]
-            try:
-                pokemon_rules = release_rules[pokemon_name]
-                if 'release_below_cp' not in pokemon_rules:
-                    pokemon_rules['release_below_cp'] = bot.config.cp
-                if 'release_below_iv' not in pokemon_rules:
-                    pokemon_rules['release_below_iv'] = bot.config.pokemon_potential
-                if 'logic' not in pokemon_rules:
-                    pokemon_rules['logic'] = 'and'
-            except KeyError:
-                pokemon_rules = {
-                    'release_below_cp': bot.config.cp,
-                    'release_below_iv': bot.config.pokemon_potential,
-                    'logic': 'and',
-                }
+            pokemon_rules = release_rules.get(pokemon_name, default_rules)
+            release_below_cp = pokemon_rules.get('release_below_cp', bot.config.cp)
+            release_below_iv = pokemon_rules.get('release_below_iv', bot.config.pokemon_potential)
+            rules_logic = pokemon_rules.get('logic', 'and')
 
             # If we've been given a caught pokemon, only process that group
             if isinstance(pokemon, Pokemon) and group != pokemon.pokemon_id:
@@ -80,11 +75,11 @@ def filter_pokemon(bot, transfer_list=None, pokemon=None):
                 # only keep everything below specified CP
                 group_transfer_list = []
                 for deck_pokemon in indexed_pokemon[group]:
-                    within_cp = (deck_pokemon.combat_power > pokemon_rules['release_below_cp'])
-                    within_potential = (deck_pokemon.potential >= pokemon_rules['release_below_iv'])
-                    if pokemon_rules['logic'] == 'and' and (within_cp and within_potential):
+                    within_cp = (deck_pokemon.combat_power > release_below_cp)
+                    within_potential = (deck_pokemon.potential >= release_below_iv)
+                    if rules_logic == 'and' and (within_cp and within_potential):
                         continue
-                    elif pokemon_rules['logic'] == 'or' and (within_cp or within_potential):
+                    elif rules_logic == 'or' and (within_cp or within_potential):
                         continue
                     group_transfer_list.append(deck_pokemon)
 
