@@ -101,8 +101,7 @@ class PoGoApi(object):
                 getattr(request, method)(*my_args, **my_kwargs)
 			
             # random request delay to prevent status code 52: too many requests
-            api_cd = random.uniform(0.5, 1.5)
-            time.sleep(api_cd)
+            time.sleep(random.uniform(0.5, 1.5))
 			
             try:
                 results = request.call()
