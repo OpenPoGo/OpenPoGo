@@ -99,10 +99,10 @@ class PoGoApi(object):
             for method in uncached_method_keys:
                 my_args, my_kwargs = methods[method]
                 getattr(request, method)(*my_args, **my_kwargs)
-			
+
             # random request delay to prevent status code 52: too many requests
             time.sleep(random.uniform(0.5, 1.5))
-			
+
             try:
                 results = request.call()
             except ServerSideRequestThrottlingException:
