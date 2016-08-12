@@ -46,10 +46,10 @@ class StateManager(object):
             "RELEASE_POKEMON": [],
             "PLAYER_UPDATE": [],
             "FORT_DETAILS": ["fort"],
-            "FORT_SEARCH": [],
+            "FORT_SEARCH": ["FORT_SEARCH"],
             "RECYCLE_INVENTORY_ITEM": [],
             "EVOLVE_POKEMON": ["evolution"],
-            "DOWNLOAD_ITEM_TEMPLATES": []
+            "DOWNLOAD_ITEM_TEMPLATES": ["DOWNLOAD_ITEM_TEMPLATES"]
         }
 
         # Maps methods to the state objects that they invalidate.
