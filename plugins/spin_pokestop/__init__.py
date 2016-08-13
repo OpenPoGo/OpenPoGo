@@ -134,15 +134,14 @@ def spin_pokestop(bot, pokestop=None):
             cooldown_time = str(format_time((pokestop_cooldown / 1000) - seconds_since_epoch))
             log("PokeStop is already on cooldown for {}.".format(cooldown_time), "red")
     elif spin_result == 4:
-        log("Loot: ", "green")
-
         manager.fire_with_context('pokestop_visited', bot, pokestop=pokestop)
 
         experience_awarded = spin_details.get("experience_awarded", False)
         if experience_awarded:
+            log("Loot: ", "green")
             log("+ {} XP".format(experience_awarded), "green")
 
-        log("+ Item bag is full.", "red")
+        log("Item bag is full.", "red")
 
         bot.fire("item_bag_full")
 
