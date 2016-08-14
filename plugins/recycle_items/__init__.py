@@ -6,7 +6,7 @@ from pokemongo_bot import logger
 
 # TODO: Use DI for config loading (requires PR #270)
 import ruamel.yaml
-import os
+import os # pylint: disable=wrong-import-order
 with open(os.path.join(os.getcwd(), 'config/plugins/recycle_items.yml'), 'r') as config_file:
     recycle_config = ruamel.yaml.load(config_file.read(), ruamel.yaml.RoundTripLoader)
 

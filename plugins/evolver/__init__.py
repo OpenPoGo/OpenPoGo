@@ -8,7 +8,7 @@ from pokemongo_bot import sleep
 
 # TODO: Use DI for config loading (requires PR #270)
 import ruamel.yaml
-import os
+import os # pylint: disable=wrong-import-order
 with open(os.path.join(os.getcwd(), 'config/plugins/evolve_pokemon.yml'), 'r') as config_file:
     evolve_config = ruamel.yaml.load(config_file.read(), ruamel.yaml.RoundTripLoader)
 
