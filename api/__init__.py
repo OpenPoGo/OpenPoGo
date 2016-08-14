@@ -125,14 +125,14 @@ class PoGoApi(object):
                 continue
 
             if results is False or results is None:
-                print("[API] API call failed. Retrying in 10 seconds...")
+                print("[API] API call failed (empty response). Retrying in 10 seconds...")
                 time.sleep(10)
             else:
-                status_code = results.get('status_code', 1)
+                status_code = results.get('status_code', 0)
                 if status_code == 3:
                     raise AccountBannedException()
-                else:
-                    print("[API] API call failed. Retrying in 10 seconds...")
+                elif status_code != 1:
+                    print("[API] API call failed (status code {}). Retrying in 10 seconds...".format(status_code))
                     time.sleep(10)
                     continue
 
