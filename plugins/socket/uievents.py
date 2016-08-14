@@ -167,4 +167,4 @@ def register_ui_events(socketio, state):
             pkm_id = int(evt["id"])
             favorite = evt["favorite"]
 
-            result = bot.api_wrapper.set_favorite_pokemon(pokemon_id=pkm_id, is_favorite=favorite).call()
+            bot.api_wrapper.set_favorite_pokemon(pokemon_id=pkm_id, is_favorite=favorite).call()
