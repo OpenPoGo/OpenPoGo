@@ -7,6 +7,7 @@ from pgoapi import PGoApi                                           # type: igno
 from pgoapi.exceptions import ServerSideRequestThrottlingException, ServerSideAccessForbiddenException, UnexpectedResponseException  # type: ignore
 
 from .state_manager import StateManager
+from .exceptions import AccountBannedException
 
 
 class PoGoApi(object):
@@ -129,7 +130,7 @@ class PoGoApi(object):
             else:
                 status_code = results.get('status_code', 1)
                 if status_code == 3:
-                    raise RuntimeException("[API] Status code 3 received. This may mean that your account is permanently banned. See https://www.reddit.com/r/pokemongodev/comments/4xkqmq/new_ban_types_and_their_causes/ for details.")
+                    raise AccountBannedException()
                 else:
                     print("[API] API call failed. Retrying in 10 seconds...")
                     time.sleep(10)
