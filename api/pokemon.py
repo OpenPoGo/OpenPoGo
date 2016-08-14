@@ -34,7 +34,7 @@ class Pokemon(JSONEncodable):
         self.weight = data.get("weight_kg", 0.0)
         self.origin = data.get("origin", 0)
 
-        self.favorite = data.get("favorite", 0) == True
+        self.favorite = data.get("favorite", 0) == 1
         self.nickname = data.get("nickname", None)
 
         self.deployed_fort_id = data.get("deployed_fort_id", None)

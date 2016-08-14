@@ -31,7 +31,7 @@ def get_indexed_pokemon(bot, transfer_list=None):
 
 # Filters Pokemon deployed at gyms
 # Never disable as it might lead to a ban!
-@manager.on("pokemon_bag_full", priority=-40)
+@manager.on("pokemon_bag_full", priority=-50)
 def filter_deployed_pokemon(bot, transfer_list=None, filter_list=None):
     # type: (PokemonGoBot, Optional[List[Pokemon]]), Optional[List[str]] -> Dict[Str, List]
 
@@ -50,7 +50,7 @@ def filter_deployed_pokemon(bot, transfer_list=None, filter_list=None):
 
 # Filters favorited Pokemon
 # Never disable as it might lead to a ban!
-@manager.on("pokemon_bag_full", priority=-30)
+@manager.on("pokemon_bag_full", priority=-40)
 def filter_favorited_pokemon(bot, transfer_list=None, filter_list=None):
     # type: (PokemonGoBot, Optional[List[Pokemon]]), Optional[List[str]] -> Dict[Str, List]
 
@@ -65,6 +65,19 @@ def filter_favorited_pokemon(bot, transfer_list=None, filter_list=None):
         filter_list.append("excluding favorited Pokemon")
 
     return {"transfer_list": new_transfer_list, "filter_list": filter_list}
+
+
+# Wraps a caught Pokemon into a list for transferring
+@manager.on("pokemon_caught", priority=-30)
+def wrap_pokemon_in_list(transfer_list=None, pokemon=None):
+    if pokemon is None:
+        return
+
+    if transfer_list is None:
+        transfer_list = []
+
+    transfer_list.append(pokemon)
+    return {"transfer_list": transfer_list}
 
 
 # Filters Pokemon based on ignore/always keep list
@@ -92,13 +105,14 @@ def filter_pokemon_by_ignore_list(bot, transfer_list=None, filter_list=None):
     if len(new_transfer_list) != len(transfer_list):
         if len(excluded_species) > 1:
             excluded_species_list = list(excluded_species)
-            filter_list.append("excluding " + "s, ".join(excluded_species_list[:-1]) + " and " + excluded_species_list[-1] + "s")
+            filter_list.append("excluding " + "s, ".join(excluded_species_list[:-1]) + "s and " + excluded_species_list[-1] + "s")
         else:
             filter_list.append("excluding " + excluded_species.pop() + "s")
 
-    return {"transfer_list": transfer_list, "filter_list": filter_list}
+    return {"transfer_list": new_transfer_list, "filter_list": filter_list}
 
 
+# TODO: Fix this function to use dependency injection for release rules
 @manager.on("pokemon_bag_full", "pokemon_caught", priority=-10)
 def filter_pokemon_by_cp_iv(bot, transfer_list=None, filter_list=None):
     # type: (PokemonGoBot, Optional[List[Pokemon]]), Optional[List[str]] -> Dict[Str, List]
