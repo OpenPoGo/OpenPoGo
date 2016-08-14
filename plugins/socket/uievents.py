@@ -103,7 +103,7 @@ def register_ui_events(socketio, state):
     @socketio.on("transfer_pokemon", namespace="/event")
     def client_ask_for_transfer(evt):
         if "bot" in state:
-            log("Web UI action: Transfer", color="yellow")
+            log("Web UI action: Transfer")
 
             bot = state["bot"]
             pkm_id = int(evt["id"])
@@ -129,7 +129,7 @@ def register_ui_events(socketio, state):
     @socketio.on("evolve_pokemon", namespace="/event")
     def client_ask_for_evolve(evt):
         if "bot" in state:
-            logger.log("Web UI action: Evolve", color="yellow")
+            log("Web UI action: Evolve")
 
             bot = state["bot"]
             pkm_id = int(evt["id"])
