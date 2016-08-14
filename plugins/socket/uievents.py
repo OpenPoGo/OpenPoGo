@@ -13,7 +13,7 @@ def find(f, seq):
     return None
 
 def log(text, color='yellow'):
-    logger.log(text, color=color, prefix='UI')
+    logger.log(text, color=color, fire_event=False, prefix='UI')
 
 def register_ui_events(socketio, state):
 
