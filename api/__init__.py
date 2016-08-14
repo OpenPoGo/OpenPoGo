@@ -130,6 +130,11 @@ class PoGoApi(object):
                 status_code = results.get('status_code', 1)
                 if status_code == 3:
                     raise RuntimeException("[API] Status code 3 received. This may mean that your account is permanently banned. See https://www.reddit.com/r/pokemongodev/comments/4xkqmq/new_ban_types_and_their_causes/ for details.")
+                else:
+                    print("[API] API call failed. Retrying in 10 seconds...")
+                    time.sleep(10)
+                    continue
+
                 # status code 1: success
                 with open('api-test.txt', 'w') as outfile:
                     outfile.write(str(results))
