@@ -37,5 +37,8 @@ class Pokemon(JSONEncodable):
         self.favorite = data.get("favorite", 0) == 1
         self.nickname = data.get("nickname", None)
 
+        self.favorite = data.get("favorite", 0) == 1
+        self.nickname = data.get("nickname", None)
+
         self.deployed_fort_id = data.get("deployed_fort_id", None)
         self.from_fort = data.get("from_fort", None)
