@@ -275,10 +275,10 @@ class PokemonGoBot(object):
         logger.log('')
 
     def _read_config_location(self):
-        self.position = self._get_pos_by_name(self.config["mapping"]["location_cache"])
+        self.position = self._get_pos_by_name(self.config["mapping"]["location"])
         self.api_wrapper.set_position(*self.position)
         logger.log('')
-        logger.log(u'[x] Address found: {}'.format(self.config["mapping"]["location_cache"]))
+        logger.log(u'[x] Address found: {}'.format(self.config["mapping"]["location"]))
 
     def _get_pos_by_name(self, location_name):
         # type: (str) -> Tuple[float, float, float]
