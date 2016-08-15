@@ -115,6 +115,8 @@ $ python pokecli.py [flags]
 | `--incubation-priority`         | `-ip`                | Priority of eggs to be incubated. Comma separated list of `-ip='10km,5km,2km'`                                                                                                              |
 | `--incubation-restrict`         | `-ir`                | Restrict an egg to an incubator. List of <distance=incubator_id>. E.g. `-ir='10km=901,5km=902'`                                                                                             |
 | `--load-library [LIB]`          | `-lib [LIB]`         | Load the `encrypt` shared library for signing Signature fields in requests from the specified path.                                                                                         |
+| `--socket-host [HOST]`          | `-sh [HOST]`         | Host to mount the socket server on.                                                                                                                                                         |
+| `--socket-port [PORT]`          | `-sp [PORT]`         | Port to mount the socket server on.                                                                                                                                                         |
 
 
 ### Command Line Example

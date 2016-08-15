@@ -39,4 +39,6 @@
     "navigator_waypoints": [],
     "navigator_campsite": null,
     "exclude_plugins": ""
+    "socket_host": "0.0.0.0",
+    "socket_port": "8000"
 }

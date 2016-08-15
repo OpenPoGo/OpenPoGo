@@ -98,6 +98,9 @@ def init_config():
             "2km": 901
         },
 
+        "socket_host": "0.0.0.0",
+        "socket_port": 8000,
+
         "debug": False,
         "test": False,
         "print_events": False
@@ -292,6 +295,18 @@ def init_config():
         help="Specify which shared library to use to generate Signature fields in requests.",
         type=str,
         dest="load_library")
+    parser.add_argument(
+        "-sh",
+        "--socket-host",
+        help="Host to mount the socket server on.",
+        type=str,
+        dest="socket_host")
+    parser.add_argument(
+        "-sp",
+        "--socket-port",
+        help="Port to mount the socket server on.",
+        type=str,
+        dest="socket_port")
 
     config = parser.parse_args()
 

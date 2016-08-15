@@ -74,6 +74,8 @@ class PokemonGoBot(object):
         self._setup_api()
         random.seed()
 
+        self.fire('bot_setup')
+
         self.stepper = Stepper(self)
         self.mapper = Mapper(self)
 
