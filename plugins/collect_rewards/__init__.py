@@ -82,5 +82,4 @@ class CollectRewards(Plugin):
 
         # fire event
         if fire_event:
-            # TODO: Add loot for the webui?
             self.event_manager.fire('player_level_up', level=CollectRewards.level_current)
