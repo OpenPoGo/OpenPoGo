@@ -27,10 +27,11 @@ class CollectRewards(Plugin):
 
     def service_player_updated(self, event, data):
         # cancel if no data is provided
-        if data == None:
+        if data is None:
             return
 
         # get current player info (not calling player, cause that will cause an infinite loop)
+        # pylint: disable=protected-access
         player = data._player
 
         # store it locally
@@ -40,7 +41,7 @@ class CollectRewards(Plugin):
         CollectRewards.level_current = int(player.level)
 
         # check for rewards on startup
-        if CollectRewards.level_previous == None:
+        if CollectRewards.level_previous is None:
             # try to claim rewards
             self._claim_levelup_reward()
 
@@ -52,7 +53,7 @@ class CollectRewards(Plugin):
     def _claim_levelup_reward(self):
         fire_event = False
         # level up notice
-        if CollectRewards.level_previous == None:
+        if CollectRewards.level_previous is None:
             self.log('Running initial reward check ...', color='yellow')
         else:
             self.log('Congratulations! You have reached level {}'.format(CollectRewards.level_current), color='green')
@@ -80,5 +81,6 @@ class CollectRewards(Plugin):
                     self.log("+ {} {}{}".format(item_count, item_name, "s" if item_count > 1 else ""), "green")
 
         # fire event
-        # TODO: Add loot for the webui?
-        self.event_manager.fire('player_level_up', level=CollectRewards.level_current)
+        if fire_event:
+            # TODO: Add loot for the webui?
+            self.event_manager.fire('player_level_up', level=CollectRewards.level_current)
