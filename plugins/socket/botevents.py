@@ -79,15 +79,12 @@ class BotEvents(object):
         self.socketio.emit("pokestop_visited", emitted_object, namespace="/event")
 
     def pokemon_caught_event(self, bot=None, pokemon=None, position=None):
-        print "pokemon_caught"
         if pokemon is None:
-            print "nope"
             return
         emitted_object = {
             "pokemon": pokemon,
             "position": position
         }
-        print emitted_object
         self.socketio.emit("pokemon_caught", emitted_object, namespace="/event")
 
     def pokemon_evolved_event(self, bot=None, pokemon=None, evolution=None):
