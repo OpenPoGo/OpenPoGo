@@ -2,7 +2,7 @@
 from app import Plugin
 from app import kernel
 
-@kernel.container.register('collect_rewards', ['@pokemongo_bot' ,'@api_wrapper', '@event_manager', '@logger'], tags=['plugin'])
+@kernel.container.register('collect_rewards', ['@pokemongo_bot', '@api_wrapper', '@event_manager', '@logger'], tags=['plugin'])
 class CollectRewards(Plugin):
     """
     # ----
