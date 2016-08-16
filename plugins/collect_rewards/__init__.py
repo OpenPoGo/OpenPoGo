@@ -25,6 +25,7 @@ class CollectRewards(Plugin):
         # register events
         self.event_manager.add_listener('service_player_updated', self.service_player_updated, priority=0)
 
+    # pylint: disable=unused-argument
     def service_player_updated(self, event, data):
         # cancel if no data is provided
         if data is None:
