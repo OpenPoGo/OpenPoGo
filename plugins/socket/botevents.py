@@ -6,7 +6,7 @@ class BotEvents(object):
         self.socketio = socketio
         self.state = state
 
-        event_manager.add_listener('bot_initialized', self.bot_initialized)
+        event_manager.add_listener('bot_initialized', self.bot_initialized, priority=-1000)
         event_manager.add_listener('position_updated', self.position_update)
 
         event_manager.add_listener('gyms_found', self.gyms_found_event, priority=-2000)
