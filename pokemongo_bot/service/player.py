@@ -3,10 +3,11 @@ from pokemongo_bot.item_list import Item
 from pokemongo_bot.human_behaviour import sleep
 
 
-@kernel.container.register('player_service', ['@api_wrapper', '@logger'])
+@kernel.container.register('player_service', ['@api_wrapper', '@event_manager', '@logger'])
 class Player(object):
-    def __init__(self, api_wrapper, logger):
+    def __init__(self, api_wrapper, event_manager, logger):
         self._api_wrapper = api_wrapper
+        self._event_manager = event_manager
         self._logger = logger
         self._logged_in = False
 
@@ -27,9 +28,11 @@ class Player(object):
         self._logged_in = self._api_wrapper.login()
         return self._logged_in
 
-    def update(self):
+    def update(self, do_sleep=True):
         response_dict = self._api_wrapper.get_player().get_inventory().call()
-        sleep(2)
+
+        if do_sleep:
+            sleep(2)
 
         if response_dict is None:
             self._log('Failed to retrieve player and inventory stats', color='red')
@@ -46,6 +49,8 @@ class Player(object):
         for item_id in self._inventory:
             if item_id in self._pokeballs:
                 self._pokeballs[item_id] = self._inventory[item_id]
+
+        self._event_manager.fire('service_player_updated', data=self)
 
         return True
 
@@ -113,7 +118,7 @@ class Player(object):
         self._api_wrapper.get_hatched_eggs()
         self._api_wrapper.check_awarded_badges()
 
-        self.update()
+        self.update(do_sleep=False)
 
         if len(self._player.hatched_eggs):
             self._player.hatched_eggs.pop(0)
