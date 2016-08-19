@@ -36,7 +36,12 @@ class Socket(Plugin):
     def set_destination_event(self, lat, lng):
         self.oldnavigator = self.bot.navigator
         self.go_there_navigator.set_destination(lat, lng)
+
         self.bot.navigator = self.go_there_navigator
+
+        if isinstance(self.oldnavigator, CamperNavigator):
+            self.oldnavigator.set_campsite(lat, lng)
+
         self.event_manager.add_listener('walking_finished', self.walking_finished_event)
         self.bot.fire("reset_navigation")
 
@@ -44,9 +49,6 @@ class Socket(Plugin):
         if self.oldnavigator is not None:
             # I would have just remove the listener but this result of loads of logs
             #self.event_manager.remove_listener('walking_finished', self.walking_finished_event)
-            if isinstance(self.oldnavigator, CamperNavigator):
-                self.oldnavigator.camping_sites = []
-
             self.bot.navigator = self.oldnavigator
             self.oldnavigator = None
             self.bot.fire("reset_navigation")

@@ -14,9 +14,9 @@ class UiEvents(object):
                 emitted_object = state.copy()
                 socketio.emit("bot_initialized", emitted_object, namespace="/event")
 
-        @socketio.on("disconnect", namespace="/event")
-        def disconnect():
-            self.log("Web client disconnected")
+        # @socketio.on("disconnect", namespace="/event")
+        # def disconnect():
+        #     self.log("Web client disconnected")
 
         @socketio.on("pokemon_settings", namespace="/event")
         def client_ask_for_pokemon_settings():
