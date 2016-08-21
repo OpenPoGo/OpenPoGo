@@ -163,22 +163,16 @@ class PokemonGoBot(object):
                     "encounter_id": fort.lure_encounter_id,
                     "latitude": fort.latitude,
                     "longitude": fort.longitude,
-                    "fort_id": fort.fort_id
+                    "fort_id": fort.lure_fort_id
                 })
 
-                print("lure pokemon")
-                print(fort.lure_encounter_id)
-                print(fort.lure_pokemon_id)
-                pokemon_name = self.pokemon_list[fort.lure_pokemon_id - 1]["Name"]
-                print(pokemon_name)
-
+        if len(lure_encounters):
+            self.fire("lure_pokemon_found", encounters=lure_encounters)
         if len(encounters):
             self.fire("pokemon_found", encounters=encounters)
         if len(pokestops):
             # should only fire new pokestops
             self.fire("pokestops_found", pokestops=pokestops)
-        if len(lure_encounters):
-            self.fire("lure_pokemon_found", encounters=lure_encounters)
 
     def fire(self, event, *args, **kwargs):
         # type: (str, *Any, **Any) -> None

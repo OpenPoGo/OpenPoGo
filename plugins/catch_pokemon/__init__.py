@@ -10,8 +10,11 @@ from pokemongo_bot.human_behaviour import sleep
 
 
 @kernel.container.register('catch_pokemon', ['@event_manager', '@logger'], tags=['plugin'])
+@kernel.container.register('catch_pokemon', ['@config.catch_pokemon', '@event_manager', '@logger'], tags=['plugin'])
 class CatchPokemon(Plugin):
     def __init__(self, event_manager, logger):
+    def __init__(self, config, event_manager, logger):
+        self.config = config
         self.event_manager = event_manager
         self.set_logger(logger, 'Catch')
 
@@ -130,6 +133,7 @@ class CatchPokemon(Plugin):
             encounter_data = response["disk_encounter"]
             status = encounter_data.status
             if status is 7:
+            if status is 5:
                 # Pokemon bag is full, fire event and return for now
                 self.log("Pokemon bag is full; cannot catch.", color="red")
                 bot.fire("pokemon_bag_full")
@@ -146,6 +150,7 @@ class CatchPokemon(Plugin):
                 pokemon_name = bot.pokemon_list[pokemon_num]["Name"]
 
                 self.log("A wild {} appeared! [CP {}] [Potential {}]".format(pokemon_name, combat_power, pokemon_potential))
+                self.log("A lured {} appeared! [CP {}] [Potential {}]".format(pokemon_name, combat_power, pokemon_potential))
 
                 balls_stock = bot.player_service.get_pokeballs()
                 total_pokeballs = sum([balls_stock[ball_type] for ball_type in balls_stock])
@@ -188,9 +193,11 @@ class CatchPokemon(Plugin):
                     total_pokeballs -= 1
                     pos = {"latitude": encounter_data.latitude, "longitude": encounter_data.longitude}
                     should_continue_throwing = self.throw_pokeball(bot, encounter_id, pokeball, spawn_point_id, pokemon, pos)
+                    should_continue_throwing = self.throw_pokeball(bot, encounter_id, pokeball, fort_id, pokemon, pos)
 
                 sleep(5)
             elif status is 6:
+            elif status is 2 or status is 3 or status is 4:
                 return
             else:
                 self.log("I don't know what happened! Maybe servers are down?", color="red")
