@@ -17,7 +17,7 @@ class Mapper(object):
         self.config = config
         self.api_wrapper = api_wrapper
         self.google_maps = google_maps
-        self.logger = logger
+        self.logger = logger.getLogger('Mapper')
 
     def get_cells(self, lat, lng):
         # type: (float, float) -> List[Cell]
@@ -67,17 +67,14 @@ class Mapper(object):
                 else:
                     raise ValueError
             except ApiError:
-                self._log("Could not fetch altitude from google. Trying geolocator.", color='yellow')
+                self.logger.warning("Could not fetch altitude from google. Trying geolocator.", color='yellow')
             except ValueError:
-                self._log("Location was not Lat/Lng. Trying geolocator.", color='yellow')
+                self.logger.warning("Location was not Lat/Lng. Trying geolocator.", color='yellow')
 
         # Fallback to geolocation if no Lat/Lng can be found
         loc = self.google_maps.geocode(location)
 
         return loc.latitude, loc.longitude, loc.altitude
-
-    def _log(self, text, color='black'):
-        self.logger.log(text, color=color, prefix='Mapper')
 
     def _get_cell_id_from_latlong(self, radius=1000):
         # type: (Optional[int]) -> List[str]
@@ -86,11 +83,11 @@ class Mapper(object):
         cells = get_cell_ids(position_lat, position_lng, radius)
 
         if self.config['debug']:
-            self._log('Cells:', color='yellow')
-            self._log('Origin: {},{}'.format(position_lat, position_lng), color='yellow')
+            self.logger.debug('Cells:', color='yellow')
+            self.logger.debug('Origin: {},{}'.format(position_lat, position_lng), color='yellow')
             for cell in cells:
                 cell_id = CellId(cell)
                 lat_lng = cell_id.to_lat_lng()
-                self._log('Cell  : {},{}'.format(lat_lng.lat().degrees, lat_lng.lng().degrees), color='yellow')
+                self.logger.debug('Cell  : {},{}'.format(lat_lng.lat().degrees, lat_lng.lng().degrees), color='yellow')
 
         return cells

@@ -104,7 +104,8 @@ class PGoApiRequestMock(pgoapi.pgoapi.PGoApiRequest):
 def create_mock_api_wrapper(config):
     # type: (Dict) -> PoGoApi
     pgoapi_instance = PGoApiMock()
-    api_wrapper = api.PoGoApi(pgoapi_instance, config)
+    logger = Logger()
+    api_wrapper = api.PoGoApi(pgoapi_instance, logger, config)
     api_wrapper.get_expiration_time = MagicMock(return_value=1000000)
     api_wrapper.set_position(0, 0, 0)
     return api_wrapper
@@ -114,6 +115,7 @@ def create_test_kernel(user_config=None):
     # type: (Dict) -> ServiceContainer
 
     kernel = Kernel()
+    logger = Mock()
 
     config = create_core_test_config(user_config)
 
@@ -121,9 +123,9 @@ def create_test_kernel(user_config=None):
     kernel.container.register_singleton('pgoapi', PGoApiMock())
     kernel.container.register_singleton(
         'plugin_manager',
-        PluginManager(os.path.dirname(os.path.realpath(__file__)) + '/plugins')
+        PluginManager(os.path.dirname(os.path.realpath(__file__)) + '/plugins', logger)
     )
-    kernel.container.register_singleton('event_manager', EventManager())
+    kernel.container.register_singleton('event_manager', EventManager(logger))
 
     kernel.container.set_parameter('path_finder', config['movement']['path_finder'])
     kernel.container.set_parameter('navigator', config['movement']['path_finder'])
@@ -157,6 +159,12 @@ def create_core_test_config(user_config=None):
             "navigator_campsite": None,
             "walk_speed": 4.16,
         },
+        "logging": {
+            "log_to_file": False,
+            "log_directory": "logs",
+            "log_directory_individual": None,
+            "file_name": "%Y-%m-%d.log"
+        },
         "plugins": {
             "exclude": [],
             "include": ['./tests/plugins'],
@@ -172,8 +180,9 @@ def create_core_test_config(user_config=None):
 def create_mock_bot(user_config=None):
     config_namespace = create_core_test_config(user_config)
 
-    event_manager = EventManager()
-    logger = Logger(event_manager)
+    logger = Logger(config_namespace)
+    event_manager = EventManager(logger)
+    logger.setEventManager(event_manager)
     api_wrapper = create_mock_api_wrapper(config_namespace)
     player_service = Player(api_wrapper, event_manager, logger)
     pokemon_service = Pokemon(api_wrapper)

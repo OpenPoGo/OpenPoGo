@@ -2,12 +2,13 @@ import unittest
 from mock import Mock
 
 from pokemongo_bot.event_manager import EventManager, Event
-
+from pokemongo_bot.logger import Logger
 
 class EventManagerTest(unittest.TestCase):
     @staticmethod
     def test_add_listener():
-        event_manager = EventManager()
+        logger = Mock()
+        event_manager = EventManager(logger)
 
         test_listener = Mock()
         event_manager.add_listener('test', test_listener)
@@ -18,7 +19,8 @@ class EventManagerTest(unittest.TestCase):
 
     @staticmethod
     def test_add_listener_priorities():
-        event_manager = EventManager()
+        logger = Mock()
+        event_manager = EventManager(logger)
 
         test_listener = Mock()
         event_manager.add_listener('test', test_listener, priority=-100)
@@ -31,7 +33,8 @@ class EventManagerTest(unittest.TestCase):
 
     @staticmethod
     def test_remove_listener():
-        event_manager = EventManager()
+        logger = Mock()
+        event_manager = EventManager(logger)
 
         test_listener = Mock()
         event_manager.add_listener('test', test_listener, priority=10)
@@ -46,7 +49,8 @@ class EventManagerTest(unittest.TestCase):
 
     @staticmethod
     def test_get_registered_events():
-        event_manager = EventManager()
+        logger = Mock()
+        event_manager = EventManager(logger)
 
         test_listener = Mock()
         event_manager.add_listener('test', test_listener)
@@ -58,7 +62,8 @@ class EventManagerTest(unittest.TestCase):
 
     @staticmethod
     def test_fire():
-        event_manager = EventManager()
+        logger = Mock()
+        event_manager = EventManager(logger)
 
         # pylint: disable=unused-argument
         def test_listener(value=None):
@@ -81,7 +86,8 @@ class EventManagerTest(unittest.TestCase):
 
     @staticmethod
     def test_fire_cancelled():
-        event_manager = EventManager()
+        logger = Mock()
+        event_manager = EventManager(logger)
 
         def test_listener():
             return {
@@ -106,16 +112,18 @@ class EventManagerTest(unittest.TestCase):
         out = StringIO()
         sys.stdout = out
 
-        event_manager = EventManager()
+        logger = Logger()
+        event_manager = EventManager(logger)
 
-        event_manager.events['test'] = Event('test')
+        event_manager.events['test'] = Event('test', logger)
         event_manager.fire('test', value=None)
 
-        assert 'WARNING: No handler has registered to handle event "test"' in out.getvalue().strip()
+        assert 'No handler has registered to handle event "test"' in out.getvalue().strip()
 
     @staticmethod
     def test_fire_with_context():
-        event_manager = EventManager()
+        logger = Mock()
+        event_manager = EventManager(logger)
 
         def test_listener(bot=None):
             bot()
@@ -134,9 +142,10 @@ class EventManagerTest(unittest.TestCase):
 
         out = StringIO()
         sys.stdout = out
-        event_manager = EventManager()
+        logger = Logger()
+        event_manager = EventManager(logger)
 
-        event_manager.events['test'] = Event('test')
+        event_manager.events['test'] = Event('test', logger)
         event_manager.events['test'].listeners['test_listener'] = []
         event_manager.print_all_event_pipelines()
 
@@ -149,9 +158,10 @@ class EventManagerTest(unittest.TestCase):
 
         out = StringIO()
         sys.stdout = out
-        event_manager = EventManager()
+        logger = Logger()
+        event_manager = EventManager(logger)
 
-        event_manager.events['test'] = Event('test')
+        event_manager.events['test'] = Event('test', logger)
         event_manager.events['test'].listeners['test_listener'] = []
         event_manager.print_all_event_pipelines()
 
@@ -165,7 +175,8 @@ class EventManagerTest(unittest.TestCase):
         out = StringIO()
         sys.stdout = out
 
-        event_manager = EventManager()
+        logger = Logger()
+        event_manager = EventManager(logger)
 
         def test_listener_1(bot=None):
             bot()

@@ -11,7 +11,7 @@ class CamperNavigator(Navigator):
         super(CamperNavigator, self).__init__(config, api_wrapper)
 
         self.camping_sites = []
-        self.logger = logger
+        self.logger = logger.getLogger('Camper')
 
         if config['movement']['navigator_campsite'] is not None:
             lat, lng = config['movement']['navigator_campsite']
@@ -33,7 +33,7 @@ class CamperNavigator(Navigator):
 
             sleep(5)
         except IndexError:
-            self.logger.log("No campsite location found", color="red", prefix="Camper")
+            self.logger.critical("No campsite location found")
 
     def set_campsite(self, longitude, latitude):
         # type: (float, float) -> None

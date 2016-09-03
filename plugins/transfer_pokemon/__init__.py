@@ -2,14 +2,13 @@ from app import Plugin
 from app import kernel
 from pokemongo_bot.human_behaviour import sleep
 
-
-@kernel.container.register('transfer_pokemon', ['@config.transfer_pokemon', '@event_manager', '@logger'],
-                           tags=['plugin'])
+@kernel.container.register('transfer_pokemon', ['@config.transfer_pokemon', '@event_manager', '@logger'], tags=['plugin'])
 class TransferPokemon(Plugin):
+
     def __init__(self, config, event_manager, logger):
         self.config = config
         self.event_manager = event_manager
-        self.set_logger(logger, 'Transfer')
+        self.logger = logger.getLogger('Transfer')
 
         if self.config["transfer_on_start"]:
             self.event_manager.add_listener('bot_initialized', self.transfer_on_bot_start)
@@ -218,14 +217,14 @@ class TransferPokemon(Plugin):
         elif len(filter_list) == 1:
             output_str += " " + filter_list[0]
 
-        self.log(output_str)
+        self.logger.info(output_str)
 
         for index, pokemon in enumerate(transfer_list):
             pokemon_num = pokemon.pokemon_id
             pokemon_name = bot.pokemon_list[pokemon_num - 1]["Name"]
             pokemon_cp = pokemon.combat_power
             pokemon_potential = pokemon.potential
-            self.log(
+            self.logger.info(
                 "Transferring {0} (#{1}) with CP {2} and IV {3} ({4}/{5})".format(
                     pokemon_name,
                     pokemon_num,
@@ -241,4 +240,4 @@ class TransferPokemon(Plugin):
             bot.player_service.add_candy(pokemon_num, 1)
             bot.fire('after_transfer_pokemon', pokemon=pokemon)
 
-        self.log("Transferred {} Pokemon.".format(len(transfer_list)))
+        self.logger.info("Transferred {} Pokemon.".format(len(transfer_list)))

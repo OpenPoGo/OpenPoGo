@@ -12,6 +12,9 @@ venv/
 instance/
 .webassets-cache
 
+# Logs
+logs/*
+
 # Other useless files
 .DS_Store
 Thumbs.db

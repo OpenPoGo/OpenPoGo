@@ -16,7 +16,7 @@ class Stepper(object):
         self.config = config
         self.api_wrapper = api_wrapper
         self.path_finder = path_finder
-        self.logger = logger
+        self.logger = logger.getLogger('Navigation')
 
         self.origin_lat = None
         self.origin_lng = None
@@ -46,10 +46,9 @@ class Stepper(object):
         dist = distance(self.current_lat, self.current_lng, destination.target_lat, destination.target_lng)
 
         if destination.name:
-            self.logger.log("Walking towards {} ({} away, eta {})".format(destination.name,
-                                                                          format_dist(dist, self.config["mapping"]["distance_unit"]),
-                                                                          format_time(destination.get_step_count())),
-                            prefix="Navigation")
+            self.logger.info("Walking towards {} ({} away, eta {})".format(destination.name,
+                                                                           format_dist(dist, self.config["mapping"]["distance_unit"]),
+                                                                           format_time(destination.get_step_count())))
 
         for step in destination.step():
             if distance(self.current_lat, self.current_lng, destination.target_lat, destination.target_lng) < 30:
@@ -58,7 +57,7 @@ class Stepper(object):
             yield step
 
         if destination.name:
-            self.logger.log("Arrived at {} ({} away)".format(destination.name, format_dist(dist, self.config["mapping"]["distance_unit"])), prefix="Navigation")
+            self.logger.info("Arrived at {} ({} away)".format(destination.name, format_dist(dist, self.config["mapping"]["distance_unit"])))
 
     def get_route_between(self, from_lat, from_lng, to_lat, to_lng, alt):
         # type: (float, float, float) -> List[(float, float, float)]

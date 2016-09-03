@@ -3,13 +3,12 @@ from app import Plugin
 from app import kernel
 from pokemongo_bot.human_behaviour import sleep
 
-
 @kernel.container.register('recycle_items', ['@config.recycle_items', '@event_manager', '@logger'], tags=['plugin'])
 class RecycleItems(Plugin):
     def __init__(self, config, event_manager, logger):
         self.config = config
         self.event_manager = event_manager
-        self.set_logger(logger, 'Recycler')
+        self.logger = logger.getLogger('Recycler')
 
         if self.config["recycle_on_start"]:
             self.event_manager.add_listener('bot_initialized', self.recycle_on_bot_start)
@@ -75,11 +74,11 @@ class RecycleItems(Plugin):
         for item_type in recyclable_items:
             quantity = recyclable_items[item_type]
             item_name = bot.item_list[item_type]
-            self.log("Recycling {} {}{}".format(quantity, item_name, "s" if quantity > 1 else ""), color="green")
+            self.logger.info("Recycling {} {}{}".format(quantity, item_name, "s" if quantity > 1 else ""), color="green")
             bot.api_wrapper.recycle_inventory_item(item_id=item_type, count=quantity).call()
             recycled_items += quantity
 
             sleep(2)
 
         if recycled_items > 0:
-            self.log("Recycled {} items.".format(recycled_items), color="green")
+            self.logger.info("Recycled {} items.".format(recycled_items), color="green")

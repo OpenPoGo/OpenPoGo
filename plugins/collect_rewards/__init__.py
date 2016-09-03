@@ -20,7 +20,7 @@ class CollectRewards(Plugin):
         self.pokemongo_bot = pokemongo_bot
         self.api_wrapper = api_wrapper
         self.event_manager = event_manager
-        self.set_logger(logger, 'RewardCollector')
+        self.logger = logger.getLogger('Rewards')
 
         # register events
         self.event_manager.add_listener('service_player_updated', self.service_player_updated, priority=0)
@@ -55,9 +55,9 @@ class CollectRewards(Plugin):
         fire_event = False
         # level up notice
         if CollectRewards.level_previous is None:
-            self.log('Running initial reward check ...', color='yellow')
+            self.logger.info('Running initial reward check ...', color='yellow')
         else:
-            self.log('Congratulations! You have reached level {}'.format(CollectRewards.level_current), color='green')
+            self.logger.info('Congratulations! You have reached level {}'.format(CollectRewards.level_current), color='green')
             fire_event = True
 
         # set previous level to current level
@@ -70,7 +70,7 @@ class CollectRewards(Plugin):
 
         # check if there is a reward to give out
         if reward_dict['result'] == 1:
-            self.log("Loot: ", "green")
+            self.logger.info("Loot: ", "green")
 
             # no reward for level 1 (will return result 1 without items_awarded)
             if 'items_awarded' in reward_dict.keys():
@@ -79,7 +79,7 @@ class CollectRewards(Plugin):
                     item_type = item['item_id']
                     item_name = self.pokemongo_bot.item_list[item_type]
                     item_count = item['item_count']
-                    self.log("+ {} {}{}".format(item_count, item_name, "s" if item_count > 1 else ""), "green")
+                    self.logger.info("+ {} {}{}".format(item_count, item_name, "s" if item_count > 1 else ""), "green")
 
         # fire event
         if fire_event:

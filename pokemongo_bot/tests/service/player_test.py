@@ -6,6 +6,7 @@ from api.player import Player as PlayerData
 from pokemongo_bot.item_list import Item
 from pokemongo_bot.service.player import Player
 from pokemongo_bot.event_manager import EventManager
+from pokemongo_bot.logger import Logger
 from pokemongo_bot.tests import create_core_test_config, create_mock_api_wrapper
 
 
@@ -15,8 +16,7 @@ class PlayerTest(unittest.TestCase):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         api_wrapper.get_api().login = Mock(return_value=True)
@@ -28,8 +28,7 @@ class PlayerTest(unittest.TestCase):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         api_wrapper.get_api().login = Mock(return_value=False)
@@ -40,8 +39,7 @@ class PlayerTest(unittest.TestCase):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         pgo = api_wrapper.get_api()
@@ -58,8 +56,7 @@ class PlayerTest(unittest.TestCase):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         pgo = api_wrapper.get_api()
@@ -75,8 +72,7 @@ class PlayerTest(unittest.TestCase):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         pgo = api_wrapper.get_api()
@@ -92,8 +88,7 @@ class PlayerTest(unittest.TestCase):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         pgo = api_wrapper.get_api()
@@ -110,8 +105,7 @@ class PlayerTest(unittest.TestCase):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         pgo = api_wrapper.get_api()
@@ -127,8 +121,7 @@ class PlayerTest(unittest.TestCase):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         pgo = api_wrapper.get_api()
@@ -144,8 +137,7 @@ class PlayerTest(unittest.TestCase):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         pgo = api_wrapper.get_api()
@@ -165,8 +157,7 @@ class PlayerTest(unittest.TestCase):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         pgo = api_wrapper.get_api()
@@ -186,8 +177,7 @@ class PlayerTest(unittest.TestCase):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         pgo = api_wrapper.get_api()
@@ -214,31 +204,31 @@ class PlayerTest(unittest.TestCase):
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
         logger = Mock()
-        logger.log = Mock()
+        logger.info = Mock()
+        logger.getLogger = Mock(return_value=logger)
         player_service = Player(api_wrapper, event_manager, logger)
 
         pgo = api_wrapper.get_api()
         pgo.set_response('get_player', self._create_generic_player_response())
         pgo.set_response('get_inventory', self._create_generic_inventory_response())
 
-        logger.log.return_value = None
-
         player_service.print_stats()
 
-        assert logger.log.call_count == 15
-        self._assert_log_call(logger.log, 'Username: test_account')
-        self._assert_log_call(logger.log, 'Bag storage: 36/350')
-        self._assert_log_call(logger.log, 'Pokemon storage: 2/250')
-        self._assert_log_call(logger.log, 'Stardust: 20,000')
-        self._assert_log_call(logger.log, 'Pokecoins: 10')
-        self._assert_log_call(logger.log, 'Poke Balls: 11')
-        self._assert_log_call(logger.log, 'Great Balls: 12')
-        self._assert_log_call(logger.log, 'Ultra Balls: 13')
-        self._assert_log_call(logger.log, '-- Level: 14')
-        self._assert_log_call(logger.log, '-- Experience: 15')
-        self._assert_log_call(logger.log, '-- Experience until next level: 985')
-        self._assert_log_call(logger.log, '-- Pokemon captured: 17')
-        self._assert_log_call(logger.log, '-- Pokestops visited: 18')
+        assert logger.info.call_count == 15
+
+        self._assert_log_call(logger.info, 'Username: test_account')
+        self._assert_log_call(logger.info, 'Bag storage: 36/350')
+        self._assert_log_call(logger.info, 'Pokemon storage: 2/250')
+        self._assert_log_call(logger.info, 'Stardust: 20,000')
+        self._assert_log_call(logger.info, 'Pokecoins: 10')
+        self._assert_log_call(logger.info, 'Poke Balls: 11')
+        self._assert_log_call(logger.info, 'Great Balls: 12')
+        self._assert_log_call(logger.info, 'Ultra Balls: 13')
+        self._assert_log_call(logger.info, '-- Level: 14')
+        self._assert_log_call(logger.info, '-- Experience: 15')
+        self._assert_log_call(logger.info, '-- Experience until next level: 985')
+        self._assert_log_call(logger.info, '-- Pokemon captured: 17')
+        self._assert_log_call(logger.info, '-- Pokestops visited: 18')
 
         assert pgo.call_stack_size() == 0
 
@@ -247,23 +237,21 @@ class PlayerTest(unittest.TestCase):
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
         logger = Mock()
-        logger.log = Mock()
+        logger.error = Mock()
+        logger.getLogger = Mock(return_value=logger)
         player_service = Player(api_wrapper, event_manager, logger)
 
         api_wrapper.call = Mock(return_value=None)
 
-        logger.log.return_value = None
-
         player_service.print_stats()
 
-        self._assert_log_call(logger.log, 'Failed to retrieve player and inventory stats', color='red')
+        self._assert_log_call(logger.error, 'Failed to retrieve player and inventory stats', 'red')
 
     def test_heartbeat(self):
         config = create_core_test_config()
         api_wrapper = create_mock_api_wrapper(config)
         event_manager = Mock()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
         player_service = Player(api_wrapper, event_manager, logger)
 
         pgo = api_wrapper.get_api()
@@ -374,5 +362,8 @@ class PlayerTest(unittest.TestCase):
         }
 
     @staticmethod
-    def _assert_log_call(log_fn, text, color='black'):
-        log_fn.assert_any_call(text, prefix='#', color=color)
+    def _assert_log_call(log_fn, message, color=None):
+        if color is None:
+            log_fn.assert_any_call(message)
+        else:
+            log_fn.assert_any_call(message, color)

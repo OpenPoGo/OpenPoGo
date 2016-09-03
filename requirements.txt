@@ -1,5 +1,6 @@
 click==6.6
 colorama==0.3.7
+colorlog==2.7.0
 enum34==1.1.6
 Flask==0.11.1
 Flask-SocketIO==2.6.1

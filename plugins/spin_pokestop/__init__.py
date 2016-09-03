@@ -15,7 +15,7 @@ from api.worldmap import PokeStop
 class SpinPokestop(Plugin):
     def __init__(self, event_manager, logger):
         self.event_manager = event_manager
-        self.set_logger(logger, 'PokeStop')
+        self.logger = logger.getLogger('PokeStop')
 
         self.event_manager.add_listener('pokestops_found', self.filter_pokestops, priority=-1000)
         self.event_manager.add_listener('pokestops_found', self.visit_near_pokestops, priority=1000)
@@ -51,7 +51,7 @@ class SpinPokestop(Plugin):
                 if pokestop.is_in_cooldown() is False:
                     self.event_manager.fire_with_context('pokestop_arrived', bot, pokestop=pokestop)
                 elif bot.config["debug"]:
-                    self.log(
+                    self.logger.info(
                         "Nearby fort found is in cooldown for {} ({}m away)".format(
                             format_time((pokestop.cooldown_timestamp_ms - now) / 1000),
                             ceil(dist)
@@ -75,7 +75,7 @@ class SpinPokestop(Plugin):
                                                     latitude=pokestop.latitude,
                                                     longitude=pokestop.longitude).call()
         dist = distance(bot.stepper.current_lat, bot.stepper.current_lng, pokestop.latitude, pokestop.longitude)
-        self.log(
+        self.logger.info(
             "Nearby PokeStop found \"{}\" ({} away)".format(
                 fort_details["fort"].fort_name,
                 format_dist(dist,
@@ -84,7 +84,7 @@ class SpinPokestop(Plugin):
             color="yellow"
         )
 
-        self.log("Spinning...", color="yellow")
+        self.logger.info("Spinning...", color="yellow")
         sleep(3)
         bot.api_wrapper.fort_search(fort_id=fort_id,
                                     fort_latitude=latitude,
@@ -94,20 +94,20 @@ class SpinPokestop(Plugin):
 
         response = bot.api_wrapper.call()
         if response is None:
-            self.log("Got empty response from the API. Skipping.", color="red")
+            self.logger.info("Got empty response from the API. Skipping.", color="red")
             return
 
         # TODO: Fix this to use a response object
         spin_details = response["FORT_SEARCH"]
         spin_result = spin_details.get("result")
         if spin_result == 1:
-            self.log("Loot: ", "green")
+            self.logger.info("Loot: ", "green")
 
             self.event_manager.fire_with_context('pokestop_visited', bot, pokestop=pokestop)
 
             experience_awarded = spin_details.get("experience_awarded", False)
             if experience_awarded:
-                self.log("+ {} XP".format(experience_awarded), "green")
+                self.logger.info("+ {} XP".format(experience_awarded), "green")
 
             items_awarded = spin_details.get("items_awarded", [])
             if len(items_awarded) > 0:
@@ -122,45 +122,45 @@ class SpinPokestop(Plugin):
                 for item_id, item_count in tmp_count_items.items():
                     item_name = bot.item_list[item_id]
 
-                    self.log("+ {} {}{}".format(item_count, item_name, "s" if item_count > 1 else ""), "green")
+                    self.logger.info("+ {} {}{}".format(item_count, item_name, "s" if item_count > 1 else ""), "green")
             else:
-                self.log("Nothing found.", "yellow")
+                self.logger.info("Nothing found.", "yellow")
 
             pokestop_cooldown = spin_details.get("cooldown_complete_timestamp_ms")
             if pokestop_cooldown:
                 seconds_since_epoch = time.time()
                 cooldown_time = str(format_time((pokestop_cooldown / 1000) - seconds_since_epoch))
-                self.log("PokeStop is on cooldown for {}.".format(cooldown_time))
+                self.logger.info("PokeStop is on cooldown for {}.".format(cooldown_time))
 
                 # Update the cooldown manually
                 pokestop.cooldown_timestamp_ms = pokestop_cooldown
 
             if not items_awarded and not experience_awarded and not pokestop_cooldown:
-                self.log("Might be softbanned, try again later.", "red")
+                self.logger.info("Might be softbanned, try again later.", "red")
         elif spin_result == 2:
-            self.log("PokeStop is out of range.", "red")
+            self.logger.info("PokeStop is out of range.", "red")
         elif spin_result == 3:
-            self.log("PokeStop is already on cooldown.", "red")
+            self.logger.info("PokeStop is already on cooldown.", "red")
             pokestop_cooldown = spin_details.get("cooldown_complete_timestamp_ms")
             if pokestop_cooldown:
                 seconds_since_epoch = time.time()
                 cooldown_time = str(format_time((pokestop_cooldown / 1000) - seconds_since_epoch))
-                self.log("PokeStop is already on cooldown for {}.".format(cooldown_time), "red")
+                self.logger.info("PokeStop is already on cooldown for {}.".format(cooldown_time), "red")
         elif spin_result == 4:
             self.event_manager.fire_with_context('pokestop_visited', bot, pokestop=pokestop)
 
             experience_awarded = spin_details.get("experience_awarded", False)
             if experience_awarded:
-                self.log("Loot: ", "green")
-                self.log("+ {} XP".format(experience_awarded), "green")
+                self.logger.info("Loot: ", "green")
+                self.logger.info("+ {} XP".format(experience_awarded), "green")
 
-                self.log("Item bag is full.", "red")
+                self.logger.info("Item bag is full.", "red")
 
             bot.fire("item_bag_full")
 
             if not experience_awarded and not pokestop_cooldown:
-                self.log("Might be softbanned, try again later.", "red")
+                self.logger.warning("Might be softbanned, try again later.", "red")
         else:
-            self.log("I don't know what happened! Maybe servers are down?", "red")
+            self.logger.warning("I don't know what happened! Maybe servers are down?", "red")
 
         sleep(2)

@@ -5,15 +5,15 @@ from mock import Mock
 from api.pokemon import Pokemon
 from plugins.transfer_pokemon import TransferPokemon
 from pokemongo_bot import EventManager
+from pokemongo_bot.logger import Logger
 from pokemongo_bot.tests import create_mock_bot
 
 
 class TransferPokemonPluginTest(unittest.TestCase):
 
     def test_wrap_pokemon(self):
-        event_manager = EventManager()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
+        event_manager = EventManager(logger)
         transfer_plugin = TransferPokemon(
             {
                 'transfer_on_start': False
@@ -29,9 +29,8 @@ class TransferPokemonPluginTest(unittest.TestCase):
         assert transfer_list[1].unique_id == 2
 
     def test_deployed_pokemon_filter(self):
-        event_manager = EventManager()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
+        event_manager = EventManager(logger)
         transfer_plugin = TransferPokemon(
             {
                 'transfer_on_start': False
@@ -65,9 +64,8 @@ class TransferPokemonPluginTest(unittest.TestCase):
         assert transfer_plugin.filter_deployed_pokemon(bot=bot) is False
 
     def test_favorited_pokemon_filter(self):
-        event_manager = EventManager()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
+        event_manager = EventManager(logger)
         transfer_plugin = TransferPokemon(
             {
                 'transfer_on_start': False
@@ -102,9 +100,8 @@ class TransferPokemonPluginTest(unittest.TestCase):
 
     # TODO: Fix test to use proper config with DI
     def test_ignore_list_filter(self):
-        event_manager = EventManager()
-        logger = Mock()
-        logger.log = Mock()
+        logger = Logger()
+        event_manager = EventManager(logger)
         transfer_plugin = TransferPokemon(
             {
                 'transfer_on_start': False,

@@ -18,7 +18,7 @@ class Socket(Plugin):
     def __init__(self, config, bot, event_manager, logger, go_there_navigator):
         self.config = config
         self.event_manager = event_manager
-        self.set_logger(logger, 'Socket')
+        self.logger = logger.getLogger('Socket')
         self.bot = bot
         self.go_there_navigator = go_there_navigator
         self.oldnavigator = None
@@ -68,7 +68,7 @@ class Socket(Plugin):
         BotEvents(self.bot, socketio, state, self.event_manager)
         UiEvents(self.bot, socketio, state, self.event_manager, self.logger)
 
-        self.log("Starting socket server...")
+        self.logger.info("Starting socket server...")
 
         socketio.run(
             app,

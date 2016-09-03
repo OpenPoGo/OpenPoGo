@@ -2,13 +2,12 @@
 from app import Plugin
 from app import kernel
 
-
 @kernel.container.register('egg_incubator', ['@config.egg_incubator', '@event_manager', '@logger'], tags=['plugin'])
 class EggIncubator(Plugin):
     def __init__(self, config, event_manager, logger):
         self.config = config
         self.event_manager = event_manager
-        self.set_logger(logger, 'Incubator')
+        self.logger = logger.getLogger('Incubator')
 
         self.event_manager.add_listener('walking_started', self.incubate_eggs, priority=1000)
         self.event_manager.add_listener('incubate_egg', self.incubate_egg)
@@ -35,7 +34,7 @@ class EggIncubator(Plugin):
 
             for egg in eggs_by_distance:
                 if len(incubators) == 0:
-                    self.log("No more free incubators ({}/{} in use)".format(in_use_count, len(all_incubators)), "yellow")
+                    self.logger.info("No more free incubators ({}/{} in use)".format(in_use_count, len(all_incubators)), "yellow")
                     return
 
                 if egg_restriction is None:
@@ -55,4 +54,4 @@ class EggIncubator(Plugin):
             return
 
         bot.api_wrapper.use_item_egg_incubator(item_id=incubator.unique_id, pokemon_id=egg.unique_id).call()
-        self.log("Put a {}km egg into an incubator".format(int(egg.total_distance)), "green")
+        self.logger.info("Put a {}km egg into an incubator".format(int(egg.total_distance)), "green")

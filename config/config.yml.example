@@ -60,6 +60,19 @@ movement:
     # Specify how fast the bot should walk, in meters/second
     walk_speed: 4.16
 
+logging:
+    # Store log messages in a file?
+    log_to_file: True
+
+    # Directory to store logs in
+    log_directory: "logs"
+
+    # Create a subdirectory for the log files (null or e.g. "Username" - you may use this to seperate logs on a per user basis)
+    log_directory_individual: null
+
+    # Defines the log filename - Format: %Y, %m, %d, %H, %M
+    file_name: "%Y-%m-%d.log"
+
 plugins:
     # Do not automatically load the specified plugins
     exclude: []

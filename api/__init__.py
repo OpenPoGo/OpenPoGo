@@ -10,11 +10,11 @@ from app import kernel
 from .state_manager import StateManager
 from .exceptions import AccountBannedException
 
-
-@kernel.container.register('api_wrapper', ['@pgoapi'], {'provider': '%pogoapi.provider%', 'username': '%pogoapi.username%', 'password': '%pogoapi.password%', 'shared_lib': '%pogoapi.shared_lib%'})
+@kernel.container.register('api_wrapper', ['@pgoapi', '@logger'], {'provider': '%pogoapi.provider%', 'username': '%pogoapi.username%', 'password': '%pogoapi.password%', 'shared_lib': '%pogoapi.shared_lib%'})
 class PoGoApi(object):
-    def __init__(self, api, provider="google", username="", password="", shared_lib="encrypt.dll"):
+    def __init__(self, api, logger, provider="google", username="", password="", shared_lib="encrypt.dll"):
         self._api = api
+        self.logger = logger.getLogger('API')
         self.provider = provider
         self.username = username
         self.password = password
@@ -76,13 +76,13 @@ class PoGoApi(object):
 
         # Check for ticket expiration before continuing
         if self.get_expiration_time() < 60 and ignore_expiration is False:
-            print("[API] Token has expired, attempting to log back in...")
+            self.logger.warning('Token has expired, attempting to log back in...')
             for _ in range(10):
                 if self.login() is False:
-                    print("[API] Failed to login. Waiting 15 seconds...")
+                    self.logger.error('Failed to login. Waiting 15 seconds...')
                     time.sleep(15)
             if self.get_expiration_time() < 60 and ignore_expiration is False:
-                print("[API] Failed to login after 10 tries, exiting.")
+                self.logger.critical('Failed to login after 10 tries, exiting.')
                 exit(1)
 
         # See which methods are uncached
@@ -107,31 +107,31 @@ class PoGoApi(object):
                 results = request.call()
             except ServerSideRequestThrottlingException:
                 # status code 52: too many requests
-                print("[API] Requesting too fast. Retrying in 10 seconds...")
+                self.logger.warning('Requesting too fast. Retrying in 10 seconds...')
                 time.sleep(10)
                 continue
             except ServerSideAccessForbiddenException:
                 # 403 Forbidden
-                print("[API] Your IP address is most likely banned. Try on a different IP/machine.")
+                self.logger.critical('Your IP address is most likely banned. Try on a different IP/machine.')
                 exit(1)
             except UnexpectedResponseException:
-                print("[API] Got a non-200 HTTP response from API. Retrying in 10 seconds...")
+                self.logger.warning('Got a non-200 HTTP response from API. Retrying in 10 seconds...')
                 time.sleep(10)
                 continue
             except TypeError:
-                print("[API] Failed to perform API call (servers might be offline). Retrying in 10 seconds...")
+                self.logger.warning('Failed to perform API call (servers might be offline). Retrying in 10 seconds...')
                 time.sleep(10)
                 continue
 
             if results is False or results is None:
-                print("[API] API call failed (empty response). Retrying in 10 seconds...")
+                self.logger.warning('API call failed (empty response). Retrying in 10 seconds...')
                 time.sleep(10)
             else:
                 status_code = results.get('status_code', None)
                 if status_code == 3:
                     raise AccountBannedException()
                 elif status_code != 1:
-                    print("[API] API call failed (status code {}). Retrying in 10 seconds...".format(status_code))
+                    self.logger.warning('API call failed (status code {}). Retrying in 10 seconds...'.format(status_code))
                     time.sleep(10)
                     continue
 

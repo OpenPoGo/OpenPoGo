@@ -80,8 +80,8 @@ def main():
             bot.run()
 
     except KeyboardInterrupt:
-        logger = kernel.container.get('logger')
-        logger.log('[x] Exiting PokemonGo Bot', 'red')
+        logger = kernel.container.get('logger').getLogger()
+        logger.info('Exiting PokemonGo Bot', 'red')
 
 
 if __name__ == '__main__':

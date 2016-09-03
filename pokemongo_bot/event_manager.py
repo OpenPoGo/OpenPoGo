@@ -2,31 +2,13 @@ from __future__ import print_function
 import inspect
 import time
 
-from colorama import Fore, Style
-
 from app import kernel
-
 
 class Event(object):
 
-    @staticmethod
-    def log(text, color=None):
-        # type: (str, Optional[str]) -> None
-
-        # Added because this code needs to run without importing the logger module.
-        color_hex = {
-            'green': Fore.GREEN,
-            'yellow': Fore.YELLOW,
-            'red': Fore.RED
-        }
-        string = str(text)
-        output = u"[" + time.strftime("%Y-%m-%d %H:%M:%S") + u"] [Events] {}".format(string)
-        if color in color_hex:
-            output = color_hex[color] + output + Style.RESET_ALL
-        print(output)
-
-    def __init__(self, name):
+    def __init__(self, name, logger):
         self.name = name
+        self.logger = logger
         self.listeners = {}
         self.num_listeners = 0
 
@@ -43,7 +25,7 @@ class Event(object):
 
     def fire(self, **kwargs):
         if self.num_listeners == 0:
-            self.log("WARNING: No handler has registered to handle event \"{}\"".format(self.name), color="yellow")
+            self.logger.warning("No handler has registered to handle event \"{}\"".format(self.name))
 
         # Sort events by priorities from greatest to least
         priorities = sorted(self.listeners, key=lambda event_priority: event_priority)
@@ -81,7 +63,7 @@ class Event(object):
 
     def print_event_pipeline(self):
         if self.num_listeners == 0:
-            self.log("Event pipeline for \"{}\" is empty.".format(self.name))
+            self.logger.debug("Event pipeline for \"{}\" is empty.".format(self.name))
         output = []
         priorities = sorted(self.listeners, key=lambda event_priority: event_priority)
         for priority in priorities:
@@ -90,19 +72,21 @@ class Event(object):
             func_names = [f.__name__ for f in self.listeners[priority]]
             output.append("{} ({})".format(priority, " -> ".join(func_names)))
         if len(output) == 0:
-            self.log("Event pipeline for \"{}\" is empty.".format(self.name))
-        self.log("Event pipeline for \"{}\":".format(self.name), color="yellow")
-        self.log(" -> ".join(output) + "\n", color="yellow")
+            self.logger.debug("Event pipeline for \"{}\" is empty.".format(self.name))
+        self.logger.debug("Event pipeline for \"{}\":".format(self.name), color="yellow")
+        self.logger.debug(" -> ".join(output) + "\n", color="yellow")
 
 
-@kernel.container.register('event_manager')
+@kernel.container.register('event_manager', ['@logger'])
 class EventManager(object):
-    def __init__(self):
+    def __init__(self, logger):
+        logger.setEventManager(self)
+        self.logger = logger.getLogger('EventManager')
         self.events = {}
 
     def add_listener(self, name, listener, **kwargs):
         if name not in self.events:
-            self.events[name] = Event(name)
+            self.events[name] = Event(name, self.logger)
         priority = kwargs.get("priority", 0)
         self.events[name].add_listener(listener, priority)
 

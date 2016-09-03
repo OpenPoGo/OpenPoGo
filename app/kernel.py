@@ -53,14 +53,15 @@ class Kernel(object):
     def boot(self):
         # type: () -> None
         self.load_config()
-        self._plugin_manager = PluginManager(self._configs['core']['plugins']['include'])
-        for plugin in self._plugin_manager.get_available_plugins():
-            if plugin not in self._disabled_plugins:
-                self._plugin_manager.load_plugin(plugin)
 
         self.container.set_parameter('kernel.config_dir', self._config_file)
         for config_name in self._configs:
             self.container.register_singleton('config.' + config_name, self._configs[config_name])
+
+        self._plugin_manager = PluginManager(self._configs['core']['plugins']['include'], self.container.get('logger'))
+        for plugin in self._plugin_manager.get_available_plugins():
+            if plugin not in self._disabled_plugins:
+                self._plugin_manager.load_plugin(plugin)
 
         self.container.boot()
 

@@ -10,25 +10,66 @@ from pokemongo_bot import Logger
 
 class LoggerTest(unittest.TestCase):
     @staticmethod
-    def test_log_by_event():
-        event_manager = EventManager()
-        logger = Logger(event_manager)
-
-        event_manager.fire = Mock()
-
-        logger.log("log row", color="yellow", prefix="test", fire_event=True)
-
-        event_manager.fire.assert_called_once_with("logging", text="log row", color="yellow", prefix="test")
-
-    @staticmethod
-    def test_log_by_call():
+    def test_debug_by_call():
         import sys
         from io import StringIO
         out = StringIO()
         sys.stdout = out
 
-        logger = Logger(Mock())
+        logger = Logger().getLogger('test')
 
-        logger.log("log row", color="yellow", prefix="test", fire_event=False)
+        logger.debug("log row", color="yellow")
+        output = out.getvalue().strip()
+        assert "[test] log row" in output
+
+    @staticmethod
+    def test_info_by_call():
+        import sys
+        from io import StringIO
+        out = StringIO()
+        sys.stdout = out
+
+        logger = Logger().getLogger('test')
+
+        logger.info("log row", color="yellow")
+        output = out.getvalue().strip()
+        assert "[test] log row" in output
+
+    @staticmethod
+    def test_warning_by_call():
+        import sys
+        from io import StringIO
+        out = StringIO()
+        sys.stdout = out
+
+        logger = Logger().getLogger('test')
+
+        logger.warning("log row", color="yellow")
+        output = out.getvalue().strip()
+        assert "[test] log row" in output
+
+    @staticmethod
+    def test_error_by_call():
+        import sys
+        from io import StringIO
+        out = StringIO()
+        sys.stdout = out
+
+        logger = Logger().getLogger('test')
+
+        logger.error("log row", color="yellow")
+        output = out.getvalue().strip()
+        assert "[test] log row" in output
+
+    @staticmethod
+    def test_critical_by_call():
+        import sys
+        from io import StringIO
+        out = StringIO()
+        sys.stdout = out
+
+        logger = Logger().getLogger('test')
+
+        logger.critical("log row", color="yellow")
         output = out.getvalue().strip()
         assert "[test] log row" in output

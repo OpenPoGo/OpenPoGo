@@ -38,7 +38,7 @@ class PokemonGoBot(object):
         self.mapper = mapper
         self.stepper = stepper
         self.navigator = navigator
-        self.logger = logger
+        self.logger = logger.getLogger()
 
         self.pokemon_list = json.load(open('data/pokemon.json'))
         self.item_list = {}
@@ -51,8 +51,8 @@ class PokemonGoBot(object):
         self.break_nav = False
         event_manager.add_listener("reset_navigation", self.reset_navigation)
 
-        self.logger.log('[x] PokemonGO Bot v1.0', color='green')
-        self.logger.log('[x] Configuration initialized', color='yellow')
+        self.logger.info('PokemonGO Bot v1.0', color='green')
+        self.logger.info('Configuration initialized', color='yellow')
 
     def start(self):
         self._setup_logging()
@@ -68,13 +68,6 @@ class PokemonGoBot(object):
         self.player_service.update()
 
     def _setup_logging(self):
-        # log settings
-        # log format
-        logging.getLogger(__name__)
-        logging.basicConfig(
-            level=logging.DEBUG,
-            format='%(asctime)s [%(module)10s] [%(levelname)5s] %(message)s')
-
         if self.config['debug']:
             logging.getLogger("requests").setLevel(logging.DEBUG)
             logging.getLogger("pgoapi").setLevel(logging.DEBUG)
@@ -89,11 +82,11 @@ class PokemonGoBot(object):
         self._set_starting_position()
 
         while not self.player_service.login():
-            self.logger.log('Login Error, server busy', color='red')
-            self.logger.log('Waiting 15 seconds before trying again...')
+            self.logger.error('Login Error, server busy', 'red')
+            self.logger.info('Waiting 15 seconds before trying again...')
             time.sleep(15)
 
-        self.logger.log('[+] Login to Pokemon Go successful.', color='green')
+        self.logger.info('Login to Pokemon Go successful.', 'green')
 
     def run(self):
         map_cells = self.mapper.get_cells(
@@ -190,10 +183,10 @@ class PokemonGoBot(object):
                     self.position = (location_json['lat'], location_json['lng'], 0.0)
                     self.api_wrapper.set_position(*self.position)
 
-                    self.logger.log('')
-                    self.logger.log('[x] Last location flag used. Overriding passed in location')
-                    self.logger.log('[x] Last in-game location was set as: {}'.format(self.position))
-                    self.logger.log('')
+                    self.logger.info('')
+                    self.logger.info('Last location flag used. Overriding passed in location')
+                    self.logger.info('Last in-game location was set as: {}'.format(self.position))
+                    self.logger.info('')
 
                     return
             except IOError:
@@ -203,10 +196,10 @@ class PokemonGoBot(object):
         # Fallback to location in configuration
         self.position = self.mapper.find_location(self.config["mapping"]["location"])
         self.api_wrapper.set_position(*self.position)
-        self.logger.log('')
-        self.logger.log(u'[x] Address found: {}'.format(self.config["mapping"]["location"]))
-        self.logger.log('[x] Position in-game set as: {}'.format(self.position))
-        self.logger.log('')
+        self.logger.info('')
+        self.logger.info(u'Address found: {}'.format(self.config["mapping"]["location"]))
+        self.logger.info('Position in-game set as: {}'.format(self.position))
+        self.logger.info('')
 
     def get_username(self):
         # type: () -> str

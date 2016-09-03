@@ -9,7 +9,7 @@ class UiEvents(object):
 
         @socketio.on("connect", namespace="/event")
         def connect():
-            self.log("Web client connected")
+            self.logger.info("Web client connected")
             if "username" in state:
                 emitted_object = state.copy()
                 socketio.emit("bot_initialized", emitted_object, namespace="/event")
@@ -78,7 +78,7 @@ class UiEvents(object):
 
         @socketio.on("transfer_pokemon", namespace="/event")
         def client_ask_for_transfer(evt):
-            self.log("Web UI action: Transfer")
+            self.logger.info("Web UI action: Transfer")
 
             pkm_id = int(evt["id"])
 
@@ -94,14 +94,14 @@ class UiEvents(object):
                 pokemon_name = self.bot.pokemon_list[pokemon_num - 1]["Name"]
                 pokemon_cp = pokemon.combat_power
                 pokemon_potential = pokemon.potential
-                self.log("Transferred {0} (#{1}) with CP {2} and IV {3}".format(pokemon_name,
-                                                                                pokemon_num,
-                                                                                pokemon_cp,
-                                                                                pokemon_potential), color="green")
+                self.logger.info("Transferred {0} (#{1}) with CP {2} and IV {3}".format(pokemon_name,
+                                                                                        pokemon_num,
+                                                                                        pokemon_cp,
+                                                                                        pokemon_potential), color="green")
 
         @socketio.on("evolve_pokemon", namespace="/event")
         def client_ask_for_evolve(evt):
-            self.log("Web UI action: Evolve")
+            self.logger.info("Web UI action: Evolve")
 
             pkm_id = int(evt["id"])
 
@@ -113,8 +113,8 @@ class UiEvents(object):
                 response = self.bot.api_wrapper.evolve_pokemon(pokemon_id=int(evt["id"])).call()
                 if response['evolution'].success:
                     evolved_id = response['evolution'].get_pokemon().pokemon_id
-                    self.log('Evolved {} into {}'.format(self.bot.pokemon_list[pokemon.pokemon_id - 1]['Name'],
-                                                         self.bot.pokemon_list[evolved_id - 1]['Name']), color="green")
+                    self.logger.info('Evolved {} into {}'.format(self.bot.pokemon_list[pokemon.pokemon_id - 1]['Name'],
+                                                                 self.bot.pokemon_list[evolved_id - 1]['Name']), color="green")
 
                     event_manager.fire_with_context('pokemon_evolved', self.bot, pokemon=pokemon, evolution=evolved_id)
 
@@ -123,12 +123,12 @@ class UiEvents(object):
             item_id = int(evt["id"])
             count = int(evt["count"])
             item_name = self.bot.item_list[item_id]
-            self.log("Recycling {} {}{}".format(count, item_name, "s" if count > 1 else ""))
+            self.logger.info("Recycling {} {}{}".format(count, item_name, "s" if count > 1 else ""))
             self.bot.api_wrapper.recycle_inventory_item(item_id=item_id, count=count).call()
 
         @socketio.on("favorite_pokemon", namespace="/event")
         def client_ask_for_favorite_pokemon(evt):
-            self.log("Web UI action: Favorite")
+            self.logger.info("Web UI action: Favorite")
 
             pkm_id = int(evt["id"])
             favorite = evt["favorite"]
@@ -137,11 +137,8 @@ class UiEvents(object):
 
         @socketio.on("set_destination", namespace="/event")
         def client_set_destination(evt):
-            self.log("Web UI action: Set Destination")
+            self.logger.info("Web UI action: Set Destination")
             self.bot.fire("set_destination", lat=evt["lat"], lng=evt["lng"])
-
-    def log(self, text, color='yellow'):
-        self.logger.log(text, color=color, fire_event=False, prefix='UI')
 
     @staticmethod
     def _find(f, seq):

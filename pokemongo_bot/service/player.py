@@ -8,7 +8,8 @@ class Player(object):
     def __init__(self, api_wrapper, event_manager, logger):
         self._api_wrapper = api_wrapper
         self._event_manager = event_manager
-        self._logger = logger
+        self._logger = logger.getLogger()
+        self._logger_egg = logger.getLogger('Egg')
         self._logged_in = False
 
         self._eggs = None
@@ -35,7 +36,7 @@ class Player(object):
             sleep(2)
 
         if response_dict is None:
-            self._log('Failed to retrieve player and inventory stats', color='red')
+            self._logger.error('Failed to retrieve player and inventory stats', 'red')
             return False
 
         self._player = response_dict['player']
@@ -98,21 +99,21 @@ class Player(object):
 
     def print_stats(self):
         if self.update() is True:
-            self._log('')
-            self._log('Username: {}'.format(self._player.username))
-            self._log('Account creation: {}'.format(self._player.get_creation_date()))
-            self._log('Bag storage: {}/{}'.format(self._inventory['count'], self._player.max_item_storage))
-            self._log('Pokemon storage: {}/{}'.format(len(self._pokemon) + len(self._eggs), self._player.max_pokemon_storage))
-            self._log('Stardust: {:,}'.format(self._player.stardust))
-            self._log('Pokecoins: {}'.format(self._player.pokecoin))
-            self._log('Poke Balls: {}'.format(self._pokeballs[1]))
-            self._log('Great Balls: {}'.format(self._pokeballs[2]))
-            self._log('Ultra Balls: {}'.format(self._pokeballs[3]))
-            self._log('-- Level: {}'.format(self._player.level))
-            self._log('-- Experience: {:,}'.format(self._player.experience))
-            self._log('-- Experience until next level: {:,}'.format(self._player.next_level_xp - self._player.experience))
-            self._log('-- Pokemon captured: {:,}'.format(self._player.pokemons_captured))
-            self._log('-- Pokestops visited: {:,}'.format(self._player.poke_stop_visits))
+            self._logger.info('')
+            self._logger.info('Username: {}'.format(self._player.username))
+            self._logger.info('Account creation: {}'.format(self._player.get_creation_date()))
+            self._logger.info('Bag storage: {}/{}'.format(self._inventory['count'], self._player.max_item_storage))
+            self._logger.info('Pokemon storage: {}/{}'.format(len(self._pokemon) + len(self._eggs), self._player.max_pokemon_storage))
+            self._logger.info('Stardust: {:,}'.format(self._player.stardust))
+            self._logger.info('Pokecoins: {}'.format(self._player.pokecoin))
+            self._logger.info('Poke Balls: {}'.format(self._pokeballs[1]))
+            self._logger.info('Great Balls: {}'.format(self._pokeballs[2]))
+            self._logger.info('Ultra Balls: {}'.format(self._pokeballs[3]))
+            self._logger.info('-- Level: {}'.format(self._player.level))
+            self._logger.info('-- Experience: {:,}'.format(self._player.experience))
+            self._logger.info('-- Experience until next level: {:,}'.format(self._player.next_level_xp - self._player.experience))
+            self._logger.info('-- Pokemon captured: {:,}'.format(self._player.pokemons_captured))
+            self._logger.info('-- Pokestops visited: {:,}'.format(self._player.poke_stop_visits))
 
     def heartbeat(self):
         self._api_wrapper.get_hatched_eggs()
@@ -122,16 +123,13 @@ class Player(object):
 
         if len(self._player.hatched_eggs):
             self._player.hatched_eggs.pop(0)
-            self._log("[Egg] Hatched an egg!", "green")
+            self._logger_egg.info("Hatched an egg!", "green")
 
     def get_hatched_eggs(self):
         self._api_wrapper.get_hatched_eggs().call()
         if len(self._player.hatched_eggs):
             self._player.hatched_eggs.pop(0)
-            self._log("[Egg] Hatched an egg!", "green")
+            self._logger_egg.info("Hatched an egg!", "green")
 
     def check_awarded_badges(self):
         self._api_wrapper.check_awarded_badges().call()
-
-    def _log(self, text, color='black'):
-        self._logger.log(text, color=color, prefix='#')
