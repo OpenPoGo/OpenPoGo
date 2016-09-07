@@ -1,9 +1,12 @@
+from datetime import date
+import json
+
 from app import kernel
 from pokemongo_bot.item_list import Item
 from pokemongo_bot.human_behaviour import sleep
 
 
-@kernel.container.register('player_service', ['@api_wrapper', '@event_manager', '@logger'])
+@kernel.container.register('player_service', ['@stealth_api', '@event_manager', '@logger'])
 class Player(object):
     def __init__(self, api_wrapper, event_manager, logger):
         self._api_wrapper = api_wrapper
@@ -26,10 +29,12 @@ class Player(object):
 
     def login(self):
         self._logged_in = self._api_wrapper.login()
+        if self._logged_in:
+            self._api_wrapper.init()
         return self._logged_in
 
-    def update(self, do_sleep=True):
-        response_dict = self._api_wrapper.get_player().get_inventory().call()
+    def update(self, do_sleep=False):
+        response_dict = self._api_wrapper.state
 
         if do_sleep:
             sleep(2)
@@ -97,7 +102,7 @@ class Player(object):
         return self._pokeballs
 
     def print_stats(self):
-        if self.update() is True:
+        if self.update(do_sleep=True) is True:
             self._log('')
             self._log('Username: {}'.format(self._player.username))
             self._log('Account creation: {}'.format(self._player.get_creation_date()))
@@ -115,9 +120,6 @@ class Player(object):
             self._log('-- Pokestops visited: {:,}'.format(self._player.poke_stop_visits))
 
     def heartbeat(self):
-        self._api_wrapper.get_hatched_eggs()
-        self._api_wrapper.check_awarded_badges()
-
         self.update(do_sleep=False)
 
         if len(self._player.hatched_eggs):
@@ -125,13 +127,10 @@ class Player(object):
             self._log("[Egg] Hatched an egg!", "green")
 
     def get_hatched_eggs(self):
-        self._api_wrapper.get_hatched_eggs().call()
+        self._api_wrapper.get_hatched_eggs()
         if len(self._player.hatched_eggs):
             self._player.hatched_eggs.pop(0)
             self._log("[Egg] Hatched an egg!", "green")
-
-    def check_awarded_badges(self):
-        self._api_wrapper.check_awarded_badges().call()
 
     def _log(self, text, color='black'):
         self._logger.log(text, color=color, prefix='#')

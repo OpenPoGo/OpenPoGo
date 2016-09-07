@@ -7,7 +7,9 @@ from .inventory_parser import InventoryParser
 from .worldmap import WorldMap, Gym, PokeStop
 from .encounter import Encounter
 from .item import Incubator
+from .exceptions import AccountBannedException
 
+import logging
 
 class StateManager(object):
     def __init__(self):
@@ -15,6 +17,7 @@ class StateManager(object):
         # Transforms response data from the server to objects.
         # Use self._noop if there is no response data.
         self.response_map = {
+            "CHECK_CHALLENGE": self._verify_challenge,
             "GET_PLAYER": self._parse_player,
             "GET_INVENTORY": self._parse_inventory,
             "GET_MAP_OBJECTS": self._parse_map,
@@ -23,105 +26,28 @@ class StateManager(object):
             "RELEASE_POKEMON": self._noop,
             "CATCH_POKEMON": self._parse_catch_pokemon,
             "PLAYER_UPDATE": self._noop,
+            "CHECK_AWARDED_BADGES": self._identity,
             "FORT_DETAILS": self._parse_fort,
             "FORT_SEARCH": self._identity,
             "RECYCLE_INVENTORY_ITEM": self._noop,
             "USE_ITEM_EGG_INCUBATOR": self._parse_use_incubator,
             "GET_HATCHED_EGGS": self._parse_get_hatched_eggs,
             "EVOLVE_POKEMON": self._parse_evolution,
+            "DOWNLOAD_SETTINGS": self._dl_settings,
             "DOWNLOAD_ITEM_TEMPLATES": self._identity,
+            "DOWNLOAD_REMOTE_CONFIG_VERSION": self._identity,
+            "GET_ASSET_DIGEST": self._identity,
             "SET_FAVORITE_POKEMON": self._identity,
             "LEVEL_UP_REWARDS": self._identity
-        }
-
-        # Maps methods to the state objects that they refresh.
-        # Used for caching.
-        self.method_returns_states = {
-            "GET_PLAYER": ["player"],
-            "GET_INVENTORY": ["player", "inventory", "pokemon", "pokedex", "candy", "eggs"],
-            "USE_ITEM_EGG_INCUBATOR": ["egg_incubators"],
-            "GET_HATCHED_EGGS": [],
-            "CHECK_AWARDED_BADGES": [],
-            "DOWNLOAD_SETTINGS": [],
-            "GET_MAP_OBJECTS": ["worldmap"],
-            "ENCOUNTER": ["encounter"],
-            "DISK_ENCOUNTER": [],
-            "RELEASE_POKEMON": [],
-            "PLAYER_UPDATE": [],
-            "FORT_DETAILS": ["fort"],
-            "FORT_SEARCH": ["FORT_SEARCH"],
-            "RECYCLE_INVENTORY_ITEM": [],
-            "EVOLVE_POKEMON": ["evolution"],
-            "DOWNLOAD_ITEM_TEMPLATES": ["DOWNLOAD_ITEM_TEMPLATES"],
-            "SET_FAVORITE_POKEMON": ["SET_FAVORITE_POKEMON"],
-            "LEVEL_UP_REWARDS": []
-        }
-
-        # Maps methods to the state objects that they invalidate.
-        # (ie. require another API call to get the correct data)
-        # If a method needs to always be called, ensure that it
-        # mutates at least one state.
-        # Used for caching.
-        self.method_mutates_states = {
-            "GET_PLAYER": [],
-            "GET_INVENTORY": [],
-            "USE_ITEM_EGG_INCUBATOR": ["egg_incubators"],
-            "GET_HATCHED_EGGS": [],
-            "CHECK_AWARDED_BADGES": [],
-            "DOWNLOAD_SETTINGS": [],
-            "GET_MAP_OBJECTS": ["worldmap"],
-            "ENCOUNTER": ["encounter", "player", "pokedex"],
-            "DISK_ENCOUNTER": ["encounter"],
-            "RELEASE_POKEMON": ["pokemon", "candy"],
-            "CATCH_POKEMON": ["encounter", "player", "pokemon", "pokedex", "candy", "inventory"],
-            "PLAYER_UPDATE": ["player", "inventory"],
-            "FORT_DETAILS": ["fort"],
-            "FORT_SEARCH": ["player", "inventory", "eggs"],
-            "RECYCLE_INVENTORY_ITEM": ["inventory"],
-            "EVOLVE_POKEMON": ["player", "inventory", "pokemon", "pokedex", "candy"],
-            "DOWNLOAD_ITEM_TEMPLATES": [],
-            "SET_FAVORITE_POKEMON": ["pokemon"],
-            "LEVEL_UP_REWARDS": ["inventory"]
         }
 
         self.current_state = {}
 
         self.staleness = {}
 
+
     def _noop(self, *args, **kwargs):
         pass
-
-    def is_stale(self, key):
-        return self.staleness.get(key, True)
-
-    # Check whether a method is cached or if it needs to be updated.
-    def is_method_cached(self, method):
-        affected_states = self.method_returns_states[method]
-        for state in affected_states:
-            if self.is_stale(state):
-                return False
-        return True
-
-    # Filter the list of methods so that only uncached methods (or methods that will become
-    # uncached) and state-invalidating methods will be called. Note that the order is
-    # important - calling GET_INVENTORY before FORT_SEARCH, for example, will return the cached
-    # and now invalidated inventory object. To fix, call FORT_SEARCH and then GET_INVENTORY.
-    def filter_cached_methods(self, method_keys):
-        will_be_stale = {}
-        uncached_methods = []
-        for method in method_keys:
-            affected_states = self.method_mutates_states[method]
-            if len(affected_states) > 0:
-                uncached_methods.append(method)
-                for state in affected_states:
-                    will_be_stale[state] = True
-            else:
-                returned_states = self.method_returns_states[method]
-                for state in returned_states:
-                    if self.is_stale(state) or will_be_stale.get(state, False):
-                        uncached_methods.append(method)
-                        break
-        return uncached_methods
 
     # Update a state object and mark it as valid.
     def _update_state(self, data):
@@ -142,25 +68,20 @@ class StateManager(object):
             return_object[key] = self.current_state.get(key, None)
         return self.current_state
 
-    # Mark the states affected by the given methods as invalid/stale.
-    def mark_stale(self, methods):
-        for method in methods:
-            for state in self.method_mutates_states[method]:
-                self.staleness[state] = True
-
-    # Mark the states returned by the given methods as invalid/stale.
-    def mark_returned_stale(self, methods):
-        for method in methods:
-            for state in self.method_returns_states[method]:
-                self.staleness[state] = True
-
     # Transform the returned data from the server into data objects and
     # then update the current state.
     def update_with_response(self, key, response):
         if key not in self.response_map:
             print(response)
             print("Unimplemented response " + key)
+            logging.error("Unimplemented response " + key)
         self.response_map[key](key, response)
+
+    def _verify_challenge(self, key, response):
+        if response["challenge_url"] != " ":
+            logging.error("Challenge URL: %s", response["challenge_url"])
+            print("ERROR Challenge:" + response["challenge_url"])
+            raise AccountBannedException()
 
     def _parse_player(self, key, response):
         current_player = self.current_state.get("player", None)
@@ -170,15 +91,20 @@ class StateManager(object):
         self._update_state({"player": current_player})
 
     def _parse_inventory(self, key, response):
-        new_inventory = InventoryParser(response)
+        full_inventory = self.current_state.get("full_inventory", InventoryParser())
+        full_inventory.update(response)
+
+        logging.debug(response)
 
         new_state = {
-            "inventory": new_inventory.items,
-            "pokedex": new_inventory.pokedex_entries,
-            "candy": new_inventory.candy,
-            "pokemon": new_inventory.pokemon,
-            "eggs": new_inventory.eggs,
-            "egg_incubators": new_inventory.egg_incubators
+            "full_inventory": full_inventory,
+            "inventory": full_inventory.items,
+            "pokedex": full_inventory.pokedex_entries,
+            "candy": full_inventory.candy,
+            "pokemon": full_inventory.pokemon,
+            "eggs": full_inventory.eggs,
+            "egg_incubators": full_inventory.egg_incubators,
+            "inventory_timestamp": full_inventory.last_updated
         }
 
         current_player = self.current_state.get("player", None)
@@ -257,3 +183,6 @@ class StateManager(object):
 
     def _identity(self, key, response):
         self._update_state({key: response})
+
+    def _dl_settings(self, key, response):
+        self._update_state({"download_settings": response})

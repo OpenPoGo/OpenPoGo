@@ -24,7 +24,7 @@ from api.encounter import Encounter
 # from api.pokemon import Pokemon
 # from api.worldmap import Cell
 
-@kernel.container.register('pokemongo_bot', ['@config.core', '@api_wrapper', '@player_service', '@pokemon_service', '@event_manager', '@mapper', '@stepper', '%navigator%', '@logger'])
+@kernel.container.register('pokemongo_bot', ['@config.core', '@stealth_api', '@player_service', '@pokemon_service', '@event_manager', '@mapper', '@stepper', '%navigator%', '@logger'])
 class PokemonGoBot(object):
     process_ignored_pokemon = False
 
@@ -57,6 +57,7 @@ class PokemonGoBot(object):
     def start(self):
         self._setup_logging()
         self._setup_api()
+
         random.seed()
 
         self.stepper.start(*self.position)

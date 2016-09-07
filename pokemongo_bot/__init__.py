@@ -1,8 +1,9 @@
 import os
-
 import sys
+import uuid
 
 import googlemaps
+import jsonpickle
 from pgoapi import PGoApi
 
 from app import kernel
@@ -28,6 +29,12 @@ def boot(service_container):
     service_container.set_parameter('pogoapi.username', config['login']['username'])
     service_container.set_parameter('pogoapi.password', config['login']['password'])
     service_container.set_parameter('pogoapi.shared_lib', config['load_library'])
+
+    if 'device_info' in config and config['device_info'] is not None:
+        device_info = dict(config['device_info'])
+        if device_info["device_id"] is None:
+            device_info["device_id"] = uuid.uuid4().hex
+        service_container.set_parameter('pogoapi.device_info', jsonpickle.encode(device_info))
 
     service_container.register_singleton('pgoapi', PGoApi())
     service_container.register_singleton('google_maps', googlemaps.Client(key=config["mapping"]["gmapkey"]))
