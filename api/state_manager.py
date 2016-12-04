@@ -7,7 +7,7 @@ from .inventory_parser import InventoryParser
 from .worldmap import WorldMap, Gym, PokeStop
 from .encounter import Encounter
 from .item import Incubator
-
+from .exceptions import AccountBannedException
 
 class StateManager(object):
     def __init__(self):
@@ -15,6 +15,7 @@ class StateManager(object):
         # Transforms response data from the server to objects.
         # Use self._noop if there is no response data.
         self.response_map = {
+            "CHECK_CHALLENGE": self._verify_challenge,
             "GET_PLAYER": self._parse_player,
             "GET_INVENTORY": self._parse_inventory,
             "GET_MAP_OBJECTS": self._parse_map,
@@ -23,13 +24,17 @@ class StateManager(object):
             "RELEASE_POKEMON": self._noop,
             "CATCH_POKEMON": self._parse_catch_pokemon,
             "PLAYER_UPDATE": self._noop,
+            "CHECK_AWARDED_BADGES": self._identity,
             "FORT_DETAILS": self._parse_fort,
             "FORT_SEARCH": self._identity,
             "RECYCLE_INVENTORY_ITEM": self._noop,
             "USE_ITEM_EGG_INCUBATOR": self._parse_use_incubator,
             "GET_HATCHED_EGGS": self._parse_get_hatched_eggs,
             "EVOLVE_POKEMON": self._parse_evolution,
+            "DOWNLOAD_SETTINGS": self._dl_settings,
             "DOWNLOAD_ITEM_TEMPLATES": self._identity,
+            "DOWNLOAD_REMOTE_CONFIG_VERSION": self._identity,
+            "GET_ASSET_DIGEST": self._identity,
             "SET_FAVORITE_POKEMON": self._identity,
             "LEVEL_UP_REWARDS": self._identity
         }
@@ -41,8 +46,11 @@ class StateManager(object):
             "GET_INVENTORY": ["player", "inventory", "pokemon", "pokedex", "candy", "eggs"],
             "USE_ITEM_EGG_INCUBATOR": ["egg_incubators"],
             "GET_HATCHED_EGGS": [],
-            "CHECK_AWARDED_BADGES": [],
-            "DOWNLOAD_SETTINGS": [],
+            "CHECK_AWARDED_BADGES": ["CHECK_AWARDED_BADGES"],
+            "CHECK_CHALLENGE": ["CHECK_CHALLENGE"],
+            "DOWNLOAD_SETTINGS": ["DOWNLOAD_SETTINGS"],
+            "DOWNLOAD_REMOTE_CONFIG_VERSION": ["DOWNLOAD_REMOTE_CONFIG_VERSION"],
+            "GET_ASSET_DIGEST": ["GET_ASSET_DIGEST"],
             "GET_MAP_OBJECTS": ["worldmap"],
             "ENCOUNTER": ["encounter"],
             "DISK_ENCOUNTER": [],
@@ -63,12 +71,15 @@ class StateManager(object):
         # mutates at least one state.
         # Used for caching.
         self.method_mutates_states = {
-            "GET_PLAYER": [],
+            "GET_PLAYER": ["GET_PLAYER"],
             "GET_INVENTORY": [],
             "USE_ITEM_EGG_INCUBATOR": ["egg_incubators"],
-            "GET_HATCHED_EGGS": [],
-            "CHECK_AWARDED_BADGES": [],
-            "DOWNLOAD_SETTINGS": [],
+            "GET_HATCHED_EGGS": ["GET_HATCHED_EGGS"],
+            "CHECK_AWARDED_BADGES": ["CHECK_AWARDED_BADGES"],
+            "CHECK_CHALLENGE": ["CHECK_CHALLENGE"],
+            "DOWNLOAD_SETTINGS": ["DOWNLOAD_SETTINGS"],
+            "DOWNLOAD_REMOTE_CONFIG_VERSION": ["DOWNLOAD_REMOTE_CONFIG_VERSION"],
+            "GET_ASSET_DIGEST": ["GET_ASSET_DIGEST"],
             "GET_MAP_OBJECTS": ["worldmap"],
             "ENCOUNTER": ["encounter", "player", "pokedex"],
             "DISK_ENCOUNTER": ["encounter"],
@@ -161,6 +172,12 @@ class StateManager(object):
             print(response)
             print("Unimplemented response " + key)
         self.response_map[key](key, response)
+
+    def _verify_challenge(self, key, response):
+        print(response)
+        if response["challenge_url"] != " ":
+            print(response["challenge_url"])
+            raise AccountBannedException()
 
     def _parse_player(self, key, response):
         current_player = self.current_state.get("player", None)
@@ -256,4 +273,8 @@ class StateManager(object):
         self._update_state({"evolution": EvolutionResult(response)})
 
     def _identity(self, key, response):
+        self._update_state({key: response})
+
+    def _dl_settings(self, key, response):
+        self.current_state["dl_settings_hash"] = response["hash"]
         self._update_state({key: response})
