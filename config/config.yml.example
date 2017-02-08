@@ -71,4 +71,4 @@ plugins:
     # Load plugin YAML config files from these directories, relative to the main config file directory.
     # Later directories will override configs in previous directories.
     config:
-        - "plugins"
+        - ["plugins"]
